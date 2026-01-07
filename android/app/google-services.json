@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "309533495539",
+    "project_id": "arovia-2bd5d",
+    "storage_bucket": "arovia-2bd5d.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:309533495539:android:573daa65da0469a0646786",
+        "android_client_info": {
+          "package_name": "com.kaizen.arovia"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCNJgxWHH2HlEHfZ_lqmvVD4uIS5_GMm6g"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
