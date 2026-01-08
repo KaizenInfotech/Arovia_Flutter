@@ -60,6 +60,34 @@ class _PatientListingPageState extends State<PatientListingPage> {
 
   }
 
+  Future<void> _refreshListData(DataProvider dataProvider, String searchText) async {
+    switch (widget.headtitle) {
+      case 'Patient History':
+        await dataProvider.getPatientHistory(searchText, widget.patientID);
+        if (mounted) {
+          setState(() {
+            widget.response = dataProvider.patientHistoryResponse;
+          });
+        }
+        break;
+
+      case 'Patient Documents':
+        await dataProvider.getPatientDocument(searchText, widget.patientID);
+        if (mounted) {
+          setState(() {
+            widget.response = dataProvider.patientDocumentResponse;
+          });
+        }
+        break;
+    }
+
+    if (mounted) {
+      setState(() {
+        selectedIndex = null; // Clear selection after refresh
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
@@ -231,78 +259,134 @@ class _PatientListingPageState extends State<PatientListingPage> {
                                   }
                                 }),
                               const SizedBox(width: 8),
-                              _buildTopButton(Icons.person_add, 'Add', () {
-                                setState(() async {
-                                  var loginID = pkid;
-                                  var moduleID = (widget.headtitle ==
-                                          'Patient Documents')
-                                      ? isDoctorLogin
-                                          ? 3
-                                          : 8
-                                      : (widget.headtitle == 'Patient History')
-                                          ? isDoctorLogin
-                                              ? 1
-                                              : 6
-                                          : 0;
-                                  var phnNo =
-                                      (widget.headtitle == 'Patient Documents')
-                                          ? ''
-                                          : widget.phoneNo;
+                              // _buildTopButton(Icons.person_add, 'Add', () {
+                              //   setState(() async {
+                              //     var loginID = pkid;
+                              //     var moduleID = (widget.headtitle ==
+                              //             'Patient Documents')
+                              //         ? isDoctorLogin
+                              //             ? 3
+                              //             : 8
+                              //         : (widget.headtitle == 'Patient History')
+                              //             ? isDoctorLogin
+                              //                 ? 1
+                              //                 : 6
+                              //             : 0;
+                              //     var phnNo =
+                              //         (widget.headtitle == 'Patient Documents')
+                              //             ? ''
+                              //             : widget.phoneNo;
+                              //
+                              //     await dataProvider.getWeblink(
+                              //         loginID ?? 0,
+                              //         moduleID,
+                              //         0,
+                              //         widget.patientID,
+                              //         0,
+                              //         0,
+                              //         0,
+                              //         phnNo);
+                              //     print(
+                              //         'WEBLINK RESULT------${dataProvider.weblinkResponse?.result}');
+                              //     Navigator.pushNamed(
+                              //         context, '/webView', arguments: {
+                              //       'url': dataProvider.weblinkResponse?.result,
+                              //       'webTitle': 'Patient Documents'
+                              //     });
+                              //   });
+                              // }),
+                              _buildTopButton(Icons.person_add, 'Add', () async {
+                                var loginID = pkid;
+                                var moduleID = (widget.headtitle == 'Patient Documents')
+                                    ? isDoctorLogin ? 3 : 8
+                                    : (widget.headtitle == 'Patient History')
+                                    ? isDoctorLogin ? 1 : 6
+                                    : 0;
+                                var phnNo = (widget.headtitle == 'Patient Documents') ? '' : widget.phoneNo;
 
-                                  await dataProvider.getWeblink(
-                                      loginID ?? 0,
-                                      moduleID,
-                                      0,
-                                      widget.patientID,
-                                      0,
-                                      0,
-                                      0,
-                                      phnNo);
-                                  print(
-                                      'WEBLINK RESULT------${dataProvider.weblinkResponse?.result}');
-                                  Navigator.pushNamed(
-                                      context, '/webView', arguments: {
-                                    'url': dataProvider.weblinkResponse?.result,
-                                    'webTitle': 'Patient Documents'
-                                  });
+                                await dataProvider.getWeblink(
+                                    loginID ?? 0, moduleID, 0, widget.patientID, 0, 0, 0, phnNo);
+
+                                print('WEBLINK RESULT------${dataProvider.weblinkResponse?.result}');
+
+                                if (!mounted) return;
+
+                                final result = await Navigator.pushNamed(context, '/webView', arguments: {
+                                  'url': dataProvider.weblinkResponse?.result,
+                                  'webTitle': widget.headtitle, // or 'Add Patient ${widget.headtitle}'
                                 });
+
+                                // Refresh data if web view returned success
+                                if (result == true && mounted) {
+                                  await _refreshListData(dataProvider, searchController.text);
+                                }
                               }),
                               const SizedBox(width: 8),
                               if (widget.headtitle != 'Patient History')
-                                _buildTopButton(Icons.edit, 'Edit', () async {
-                                  if (selectedIndex != null) {
+                                // _buildTopButton(Icons.edit, 'Edit', () async {
+                                //   if (selectedIndex != null) {
+                                //     var loginID = pkid;
+                                //     var moduleID = (widget.headtitle ==
+                                //             'Patient Documents')
+                                //         ? isDoctorLogin
+                                //             ? 3
+                                //             : 8
+                                //         : 4;
+                                //
+                                //     await dataProvider.getWeblink(
+                                //         loginID ?? 0,
+                                //         moduleID,
+                                //         0,
+                                //         widget.patientID,
+                                //         0,
+                                //         0,
+                                //         docID ?? 0,
+                                //         '');
+                                //     print(
+                                //         'WEBLINK RESULT------${dataProvider.weblinkResponse?.result}');
+                                //     Navigator.pushNamed(
+                                //         context, '/webView', arguments: {
+                                //       'url':
+                                //           dataProvider.weblinkResponse?.result,
+                                //       'webTitle': 'Patient Documents'
+                                //     });
+                                //   } else {
+                                //     ScaffoldMessenger.of(context).showSnackBar(
+                                //         const SnackBar(
+                                //             content: Text(
+                                //                 "Please select the document to edit")));
+                                //   }
+                                // }),
+                                if (widget.headtitle != 'Patient History')
+                                  _buildTopButton(Icons.edit, 'Edit', () async {
+                                    if (selectedIndex == null) {
+                                      ScaffoldMessenger.of(context).showSnackBar(
+                                          const SnackBar(content: Text("Please select the document to edit")));
+                                      return;
+                                    }
+
                                     var loginID = pkid;
-                                    var moduleID = (widget.headtitle ==
-                                            'Patient Documents')
-                                        ? isDoctorLogin
-                                            ? 3
-                                            : 8
+                                    var moduleID = (widget.headtitle == 'Patient Documents')
+                                        ? isDoctorLogin ? 3 : 8 // Adjust moduleID for edit if different
                                         : 4;
 
-                                    await dataProvider.getWeblink(
-                                        loginID ?? 0,
-                                        moduleID,
-                                        0,
-                                        widget.patientID,
-                                        0,
-                                        0,
-                                        docID ?? 0,
-                                        '');
-                                    print(
-                                        'WEBLINK RESULT------${dataProvider.weblinkResponse?.result}');
-                                    Navigator.pushNamed(
-                                        context, '/webView', arguments: {
-                                      'url':
-                                          dataProvider.weblinkResponse?.result,
-                                      'webTitle': 'Patient Documents'
+                                    await dataProvider.getWeblink(loginID ?? 0, moduleID, 0, widget.patientID,
+                                        0, 0, docID ?? 0, '');
+
+                                    print('WEBLINK RESULT------${dataProvider.weblinkResponse?.result}');
+
+                                    if (!mounted) return;
+
+                                    final result = await Navigator.pushNamed(context, '/webView', arguments: {
+                                      'url': dataProvider.weblinkResponse?.result,
+                                      'webTitle': 'Edit ${widget.headtitle}',
                                     });
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(
-                                            content: Text(
-                                                "Please select the document to edit")));
-                                  }
-                                }),
+
+                                    // Refresh data if edit was successful
+                                    if (result == true && mounted) {
+                                      await _refreshListData(dataProvider, searchController.text);
+                                    }
+                                  }),
                             ],
                           ),
                         ),

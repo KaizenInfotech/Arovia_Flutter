@@ -152,7 +152,7 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
   }
 
   Future<bool> checkForceUpdate() async {
-// Then use the appropriate one
+     // Then use the appropriate one
     final requiredVersion = Platform.isIOS ? apiIOS :  apiAndroid;
 
     // Get the current app version
@@ -186,8 +186,6 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
     }
   }
 
-  
-
   void _subscriptionCheck(String link) {
     // Prevent showing multiple times
     if (_isSubscriptionPopupShown) return;
@@ -202,8 +200,6 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
       _isSubscriptionPopupShown = false;
     });
   }
-
-
 
   void _checkSessionExpired(DataProvider dataProvider) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
