@@ -265,7 +265,7 @@ class _DetailScreenState extends State<DetailScreen> {
                                                   ''),
                             _listDetail(
                                 (widget.headtitle == 'Assistant')
-                                    ? 'CashFree Status'
+                                    ? 'Status'
                                     : 'Date & Time',
                                 (widget.headtitle == 'Assistant')
                                     ? widget.response?.result[widget.index]

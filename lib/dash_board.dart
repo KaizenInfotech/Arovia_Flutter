@@ -186,93 +186,7 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
     }
   }
 
-  // void _subscriptionCheck(String link) async {
-  //
-  //   if (Platform.isIOS) {
-  //       showGeneralDialog(
-  //         context: context,
-  //         barrierDismissible: true,
-  //         barrierLabel: 'Dismiss',
-  //         barrierColor: Colors.transparent, // No default dimming
-  //         pageBuilder: (context, animation, secondaryAnimation) {
-  //           return BackdropFilter(
-  //             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-  //             child: Center(
-  //               child: CupertinoAlertDialog(
-  //                 title: Text( ""),
-  //
-  //                 content: Text( "Your Subscription Expired"),
-  //
-  //                 actions: [
-  //                   CupertinoDialogAction(
-  //                     child: const Text("PAY"),
-  //                     onPressed: () async {
-  //                       _launchURL(link);
-  //                       Navigator.of(context).pop(); // Dismiss dialog
-  //                       //---Remove Login
-  //                       // Navigator.of(context).pushNamedAndRemoveUntil('/',
-  //                       //     (route) => false); // Navigate to initial screen
-  //                       // final SharedPreferences prefs =
-  //                       //     await SharedPreferences.getInstance();
-  //                       // await prefs.remove('isFirstLaunch');
-  //                       // await prefs.remove('isDoctorLogin');
-  //                     },
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //           );
-  //         },
-  //         transitionDuration: const Duration(milliseconds: 200),
-  //         transitionBuilder: (context, animation, secondaryAnimation, child) {
-  //           return FadeTransition(
-  //             opacity: animation,
-  //             child: child,
-  //           );
-  //         },
-  //       );
-  //     } else {
-  //       showGeneralDialog(
-  //         context: context,
-  //         barrierDismissible: true,
-  //         barrierLabel: "Dismiss",
-  //         barrierColor: Colors.black.withOpacity(0.2), // optional dim + blur
-  //         transitionDuration: const Duration(milliseconds: 200),
-  //         pageBuilder: (context, animation, secondaryAnimation) {
-  //           return BackdropFilter(
-  //             filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-  //             child: Center(
-  //               child: AlertDialog(
-  //                 title: Text( ""),
-  //                 content: Text( "Your Subscription Expired"),
-  //
-  //                 actions: [
-  //                   TextButton(
-  //                     child: const Text("PAY"),
-  //                     onPressed: () async {
-  //                       Navigator.of(context).pop(); // Close dialog
-  //                       //---Remove login
-  //                       // Navigator.of(context)
-  //                       //     .pushNamedAndRemoveUntil('/', (route) => false);
-  //                       // final prefs = await SharedPreferences.getInstance();
-  //                       // await prefs.remove('isFirstLaunch');
-  //                       // await prefs.remove('isDoctorLogin');
-  //                     },
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //           );
-  //         },
-  //         transitionBuilder: (context, animation, secondaryAnimation, child) {
-  //           return FadeTransition(
-  //             opacity: animation,
-  //             child: child,
-  //           );
-  //         },
-  //       );
-  //     }
-  // }
+  
 
   void _subscriptionCheck(String link) {
     // Prevent showing multiple times
@@ -289,113 +203,7 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
     });
   }
 
-  // void _checkSessionExpired(DataProvider dataProvider) async {
-  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
-  //   pkID = prefs.getInt('mem_ID') ?? 0;
-  //   imei = prefs.getString('imei') ?? '';
-  //
-  //   await dataProvider.getSessionTimeOut(pkID, imei);
-  //
-  //   final sessionTimeOut = dataProvider.sessionTimeOutResponse?.status ?? '';
-  //   print('Session Expired &&&&&&&&&&&& $sessionTimeOut');
-  //   if (sessionTimeOut != "0") {
-  //
-  //     if (Platform.isIOS) {
-  //       showGeneralDialog(
-  //         context: context,
-  //         barrierDismissible: true,
-  //         barrierLabel: 'Dismiss',
-  //         barrierColor: Colors.transparent, // No default dimming
-  //         pageBuilder: (context, animation, secondaryAnimation) {
-  //           return BackdropFilter(
-  //             filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-  //             child: Center(
-  //               child: CupertinoAlertDialog(
-  //                 title: Text((sessionTimeOut == '-2')
-  //                     ? "Session Expired"
-  //                     : (sessionTimeOut == '-1')
-  //                         ? "Member is deleted"
-  //                         : "Session Expired"),
-  //                 content: Text((sessionTimeOut == '-2')
-  //                     ? "Your session has expired. Please log in again."
-  //                     : (sessionTimeOut == '-1')
-  //                         ? "Session Time out , Please Register Your Mobile Number"
-  //                         : "Your session has expired. Please log in again."),
-  //                 actions: [
-  //                   CupertinoDialogAction(
-  //                     child: const Text("OK"),
-  //                     onPressed: () async {
-  //                       Navigator.of(context).pop(); // Dismiss dialog
-  //                       Navigator.of(context).pushNamedAndRemoveUntil('/',
-  //                           (route) => false); // Navigate to initial screen
-  //                       final SharedPreferences prefs =
-  //                           await SharedPreferences.getInstance();
-  //                       await prefs.remove('isFirstLaunch');
-  //                       await prefs.remove('isDoctorLogin');
-  //                     },
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //           );
-  //         },
-  //         transitionDuration: const Duration(milliseconds: 200),
-  //         transitionBuilder: (context, animation, secondaryAnimation, child) {
-  //           return FadeTransition(
-  //             opacity: animation,
-  //             child: child,
-  //           );
-  //         },
-  //       );
-  //     } else {
-  //       showGeneralDialog(
-  //         context: context,
-  //         barrierDismissible: true,
-  //         barrierLabel: "Dismiss",
-  //         barrierColor: Colors.black.withOpacity(0.2), // optional dim + blur
-  //         transitionDuration: const Duration(milliseconds: 200),
-  //         pageBuilder: (context, animation, secondaryAnimation) {
-  //           return BackdropFilter(
-  //             filter: ImageFilter.blur(sigmaX: 5, sigmaY: 5),
-  //             child: Center(
-  //               child: AlertDialog(
-  //                 title: Text((sessionTimeOut == '-2')
-  //                     ? "Session Expired"
-  //                     : (sessionTimeOut == '-1')
-  //                         ? "Member is deleted"
-  //                         : "Session Expired"),
-  //                 content: Text((sessionTimeOut == '-2')
-  //                     ? "Your session has expired. Please log in again."
-  //                     : (sessionTimeOut == '-1')
-  //                         ? "Session Time out , Please Register Your Mobile Number"
-  //                         : "Your session has expired. Please log in again."),
-  //                 actions: [
-  //                   TextButton(
-  //                     child: const Text("OK"),
-  //                     onPressed: () async {
-  //                       Navigator.of(context).pop(); // Close dialog
-  //                       Navigator.of(context)
-  //                           .pushNamedAndRemoveUntil('/', (route) => false);
-  //                       final prefs = await SharedPreferences.getInstance();
-  //                       await prefs.remove('isFirstLaunch');
-  //                       await prefs.remove('isDoctorLogin');
-  //                     },
-  //                   ),
-  //                 ],
-  //               ),
-  //             ),
-  //           );
-  //         },
-  //         transitionBuilder: (context, animation, secondaryAnimation, child) {
-  //           return FadeTransition(
-  //             opacity: animation,
-  //             child: child,
-  //           );
-  //         },
-  //       );
-  //     }
-  //   }
-  // }
+
 
   void _checkSessionExpired(DataProvider dataProvider) async {
     final SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -621,12 +429,33 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
                   // ),
                 ),
                 // const Icon(Icons.notifications_none, size: 28, color: Colors.black),
-                GestureDetector(onTap: () {
-                  showLogoutPopup(context: context);
-                },child: Padding(
-                  padding:  const EdgeInsets.only(left: 5.0),
-                  child: Image.asset("assets/logout.png"),
-                ))
+       GestureDetector(
+onTap: () async {
+final dataProvider = Provider.of<DataProvider>(context, listen: false);
+
+ // First, check session validity
+ final SharedPreferences prefs = await SharedPreferences.getInstance();
+ int currentPkID = prefs.getInt('mem_ID') ?? 0;
+ String currentImei = prefs.getString('imei') ?? '';
+
+ await dataProvider.getSessionTimeOut(currentPkID, currentImei);
+ final sessionStatus = dataProvider.sessionTimeOutResponse?.status ?? '0';
+
+ // If session is expired or invalid (-1 or -2), do NOT show logout popup
+ if (sessionStatus != '0') {
+// _checkSessionExpired already handles showing the expiration dialog and logout
+_checkSessionExpired(dataProvider);
+return; // Exit early — don't show logout popup
+}
+
+ // Session is valid → safe to show logout confirmation popup
+ showLogoutPopup(context: context);
+},
+child: Padding(
+padding: const EdgeInsets.only(left: 5.0),
+ child: Image.asset("assets/logout.png"),
+  ),
+),
               ],
             ),
           ),
