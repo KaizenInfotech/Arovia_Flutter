@@ -29,6 +29,8 @@ class _ListingPageState extends State<ListingPage> {
   int? assistantID;
   int? patientID;
   String? amountPending;
+
+  String? patientName;
   int? searchQuery;
   int? itemStatusCount;
   int? itemResponseCount;
@@ -1050,12 +1052,24 @@ class _ListingPageState extends State<ListingPage> {
                                                                         index]
                                                                     .pkPatientId ??
                                                                 0;
+                                                            print("Patient Name :: ${widget
+                                                                .response
+                                                                ?.result[
+                                                            index]
+                                                                .patiantName ??
+                                                                ''}");
                                                             amountPending = widget
                                                                     .response
                                                                     ?.result[
                                                                         index]
                                                                     .pendingAmount ??
                                                                 '';
+
+                                                            patientName = widget
+                                                                .response
+                                                                ?.result[
+                                                            index]
+                                                                .patiantName ?? "";
                                                             Navigator.pushNamed(
                                                                 context,
                                                                 '/patientDetail',
@@ -1069,7 +1083,8 @@ class _ListingPageState extends State<ListingPage> {
                                                                       ?.result[
                                                                           index]
                                                                       .patiantMobileNumber,
-                                                                    'isDoctorLogin' : isDoctorLogin
+                                                                    'isDoctorLogin' : isDoctorLogin,
+                                                                  'patientName': patientName
                                                                 });
                                                           } else {
                                                             Navigator.pushNamed(

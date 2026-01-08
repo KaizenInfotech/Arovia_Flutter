@@ -5,16 +5,19 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+import 'constants/utils.dart';
+
 class PatientListingPage extends StatefulWidget {
   PatientListingPage(
       {super.key,
       required this.headtitle,
       required this.patientID,
       required this.phoneNo,
-      required this.response});
+      required this.response, this.patientName,});
   final headtitle;
   final patientID;
   final phoneNo;
+  final patientName;
   Result? response;
 
   @override
@@ -181,7 +184,7 @@ class _PatientListingPageState extends State<PatientListingPage> {
                     ),
                     const SizedBox(width: 8),
                     Text(
-                      widget.headtitle ?? '',
+                      "${Utils().capitalizeEachWord(widget.patientName ??"")} ${widget.headtitle}" ?? '',
                       style: const TextStyle(
                           fontSize: 18, fontWeight: FontWeight.bold),
                     ),

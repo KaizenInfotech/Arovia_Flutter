@@ -138,7 +138,7 @@ class MainApp extends StatelessWidget {
                       patientID: args?['patientID'],
                       amtPending: args?['amtPending'],
                       phoneNumber: args?['phoneNo'],
-                      isDoctorLogin: args?['isDoctorLogin'],
+                      isDoctorLogin: args?['isDoctorLogin'],patientName: args?['patientName'],
                     ));
 
           case '/PatientListingPage':
@@ -147,7 +147,7 @@ class MainApp extends StatelessWidget {
                       patientID: args?['patientID'],
                       response: args?['response'],
                       headtitle: args?['headTitle'],
-                      phoneNo: args?['phoneNo'],
+                      phoneNo: args?['phoneNo'],patientName: args?["patientName"],
                     ));
 
           case '/detailScreen':

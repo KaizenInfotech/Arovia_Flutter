@@ -1,3 +1,4 @@
+import 'package:arovia/constants/utils.dart';
 import 'package:arovia/data_model.dart';
 import 'package:arovia/data_provider.dart';
 import 'package:arovia/widgets/profile_photo.dart';
@@ -12,10 +13,11 @@ class PatientDetailPage extends StatefulWidget {
       required this.patientID,
       required this.amtPending,
       required this.phoneNumber,
-      required this.isDoctorLogin});
+      required this.isDoctorLogin, this.patientName});
   final patientID;
   final String? amtPending;
   final String? phoneNumber;
+  final String? patientName;
   final bool? isDoctorLogin;
 
   @override
@@ -110,8 +112,8 @@ class _PatientDetailPageState extends State<PatientDetailPage> {
                       },
                     ),
                     const SizedBox(width: 8),
-                    const Text(
-                      'Patients',
+                     Text(
+                      '${Utils().capitalizeEachWord(widget.patientName ??"")} Patient',
                       style:
                           TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
                     ),
@@ -126,11 +128,13 @@ class _PatientDetailPageState extends State<PatientDetailPage> {
                       await dataProvider.getPatientDocument(
                           '', widget.patientID);
                       response = dataProvider.patientDocumentResponse;
+
                       Navigator.pushNamed(context, '/PatientListingPage',
                           arguments: {
                             'headTitle': 'Patient Documents',
                             'response': response,
-                            'patientID': widget.patientID
+                            'patientID': widget.patientID,
+                            'patientName': widget.patientName
                           });
                     }),
                     const SizedBox(width: 10),
@@ -144,7 +148,8 @@ class _PatientDetailPageState extends State<PatientDetailPage> {
                             'headTitle': 'Patient History',
                             'response': response,
                             'patientID': widget.patientID,
-                            'phoneNo': widget.phoneNumber
+                            'phoneNo': widget.phoneNumber,
+                            'patientName': widget.patientName
                           });
                     }),
                   ],
