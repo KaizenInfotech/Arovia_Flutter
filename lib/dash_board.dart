@@ -349,9 +349,12 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
 
   Future<void> _getID() async {
     final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('isFirstLaunch', 1);
     pkID = prefs.getInt('mem_ID') ?? 0;
     imei = prefs.getString('imei') ?? '';
+    await prefs.setInt('pkID', pkID);
     isDoctorLogin = prefs.getBool('isDoctorLogin') ?? false;
+
 
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
 
