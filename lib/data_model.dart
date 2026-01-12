@@ -141,7 +141,7 @@ class ResultElement {
       type: json["type"] ?? "",
       url: json["url"] ?? "",
       name: json["name"] ?? "",
-      cashfreeStatus: json["cashfree_status"] ?? "",
+      cashfreeStatus: json["status"] ?? "",
       vendorId: json["vendor_id"] ?? "",
       docCreateddate: json["doc_createddate"] ?? "",
       createddate: json["createddate"] ?? "",

@@ -506,216 +506,7 @@ padding: const EdgeInsets.only(left: 5.0),
             ),
           ),
           backgroundColor: const Color.fromRGBO(251, 246, 227, 1),
-          // body: Consumer<DataProvider>(builder: (context, dataProvider, child) {
-          //   return RefreshIndicator(
-          //     onRefresh: () {
-          //       print("<<<<<<<<<<<<< User Data Refreshed >>>>>>>>>>>>>");
-          //      return _getID();
-          //     },
-          //     child: SingleChildScrollView(
-          //       child: Column(
-          //         children: [
-          //           const SizedBox(
-          //             height: 50,
-          //           ),
-          //           Expanded(
-          //               child: Padding(
-          //             padding: const EdgeInsets.all(16.0),
-          //             child: SingleChildScrollView(
-          //               child: Column(
-          //                 children: [
-          //                   Padding(
-          //                     padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
-          //                     child: Row(
-          //                       children: [
-          //                         _welcomeContainer(
-          //                             '', 'Appointment', 16, FontWeight.w500,
-          //                             () async {
-          //                           print('Appointment Tapped');
-          //                           if (isDoctorLogin) {
-          //                             await dataProvider.getAppointmentListDoctor(
-          //                                 '', pkID);
-          //                             response =
-          //                                 dataProvider.appointmentListDoctorResponse;
-          //                           } else {
-          //                             await dataProvider.getAppointmentListAssistant(
-          //                                 '', pkID);
-          //                             response = dataProvider
-          //                                 .appointmentListAssistantResponse;
-          //                           }
-          //                           Navigator.pushNamed(
-          //                               context, '/appointmentDetailPage',
-          //                               arguments: {
-          //                                 'loginType': isDoctorLogin,
-          //                                 'pkID': pkID,
-          //                                 'respon': response
-          //                               }).then((_) {
-          //                             _checkSessionExpired(dataProvider);
-          //                           });
-          //                         }),
-          //                         const SizedBox(
-          //                           width: 8.0,
-          //                         ),
-          //                         _welcomeContainer(
-          //                             '', 'Pending\nPayments', 16, FontWeight.w500,
-          //                             () async {
-          //                           print('Pending Payments Tapped');
-          //                           if (isDoctorLogin) {
-          //                             await dataProvider
-          //                                 .getPendingAppointmentListDoctor('', pkID);
-          //                             response = dataProvider
-          //                                 .pendingAppointmentListDoctorResponse;
-          //                           } else {
-          //                             await dataProvider
-          //                                 .getPendingAppointmentListAssistant(
-          //                                     '', pkID);
-          //                             response = dataProvider
-          //                                 .pendingAppointmentListAssistantResponse;
-          //                           }
-          //                           // Navigator.pushNamed(context, '/listingPagescreen',
-          //                           //     arguments: {
-          //                           //       'headTitle': 'Pending Payments',
-          //                           //       'response': response
-          //                           //     })
-          //                           Navigator.of(context)
-          //                               .push(
-          //                             MaterialPageRoute(
-          //                               builder: (context) => ListingPage(
-          //                                 headtitle: 'Pending Payments',
-          //                                 response: response, // full Result object
-          //                                 subscripPayment: null,
-          //                               ),
-          //                             ),
-          //                           )
-          //                               .then((_) {
-          //                             _checkSessionExpired(dataProvider);
-          //                           });
-          //                         }),
-          //                       ],
-          //                     ),
-          //                   ),
-          //                   Padding(
-          //                     padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-          //                     child: Row(
-          //                       mainAxisAlignment: isDoctorLogin
-          //                           ? MainAxisAlignment.start
-          //                           : MainAxisAlignment.center,
-          //                       children: [
-          //
-          //                           _welcomeContainer(
-          //                               '', 'Patients', 16, FontWeight.w500,
-          //                               () async {
-          //                             print('Patients Tapped');
-          //                             if (isDoctorLogin) {
-          //                               await dataProvider.getPatientListDoctor(
-          //                                   '', pkID);
-          //                               response =
-          //                                   dataProvider.patientListDoctorResponse;
-          //                             } else {
-          //                               await dataProvider.getPatientListAssistant(
-          //                                   '', pkID);
-          //                               response =
-          //                                   dataProvider.patientListAssistantResponse;
-          //                             }
-          //                             // Navigator.pushNamed(
-          //                             //     context, '/listingPagescreen', arguments: {
-          //                             //   'headTitle': 'Patients',
-          //                             //   'response': response
-          //                             // })
-          //                             Navigator.of(context)
-          //                                 .push(
-          //                               MaterialPageRoute(
-          //                                 builder: (context) => ListingPage(
-          //                                   headtitle: 'Patients',
-          //                                   response: response, // full Result object
-          //                                   subscripPayment: null,
-          //                                 ),
-          //                               ),
-          //                             )
-          //                                 .then((_) {
-          //                               _checkSessionExpired(dataProvider);
-          //                             });
-          //                           }),
-          //                         const SizedBox(
-          //                           width: 8.0,
-          //                         ),
-          //                         if (isDoctorLogin)
-          //                         _welcomeContainer(
-          //                             '', 'Assistant', 16, FontWeight.w500, () async {
-          //                           print('Assistant Tapped');
-          //                           await dataProvider.getAssistant('', pkID);
-          //                           response = dataProvider.assistantResponse;
-          //                           // Navigator.pushNamed(context, '/listingPagescreen',
-          //                           //     arguments: {
-          //                           //       'headTitle': 'Assistant',
-          //                           //       'response': response
-          //                           //     })
-          //                           Navigator.of(context)
-          //                               .push(
-          //                             MaterialPageRoute(
-          //                               builder: (context) => ListingPage(
-          //                                 headtitle: 'Assistant',
-          //                                 response: response, // full Result object
-          //                                 subscripPayment: null,
-          //                               ),
-          //                             ),
-          //                           )
-          //                               .then((_) {
-          //                             _checkSessionExpired(dataProvider);
-          //                           });
-          //                         }),
-          //                       ],
-          //                     ),
-          //                   ),
-          //                   if (isDoctorLogin)
-          //                     Padding(
-          //                       padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-          //                       child: Row(
-          //                         mainAxisAlignment: MainAxisAlignment.center,
-          //                         children: [
-          //                           _welcomeContainer(
-          //                               '', 'Subscription', 16, FontWeight.w500,
-          //                               () async {
-          //                             print('Subscription Tapped');
-          //                             await dataProvider.getSubscriptionPayment(pkID);
-          //                             final link = dataProvider
-          //                                     .subscriptionPaymentResponse
-          //                                     ?.paymentlink ??
-          //                                 '';
-          //                             await dataProvider.getSubscription(pkID);
-          //                             response = dataProvider.subscriptionResponse;
-          //                             // Navigator.pushNamed(
-          //                             //     context, '/listingPagescreen', arguments: {
-          //                             //   'headTitle': 'Subscription',
-          //                             //   'response': response,
-          //                             //   'subsLink': link
-          //                             // })
-          //                             Navigator.of(context)
-          //                                 .push(
-          //                               MaterialPageRoute(
-          //                                 builder: (context) => ListingPage(
-          //                                   headtitle: 'Subscription',
-          //                                   response: response, // full Result object
-          //                                   subscripPayment: link,
-          //                                 ),
-          //                               ),
-          //                             )
-          //                                 .then((_) {
-          //                               _checkSessionExpired(dataProvider);
-          //                             });
-          //                           }),
-          //                         ],
-          //                       ),
-          //                     ),
-          //                 ],
-          //               ),
-          //             ),
-          //           ))
-          //         ],
-          //       ),
-          //     ),
-          //   );
-          // })),
+
         body: Consumer<DataProvider>(
           builder: (context, dataProvider, child) {
             return RefreshIndicator(
@@ -853,6 +644,38 @@ padding: const EdgeInsets.only(left: 5.0),
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
+                              _welcomeContainer(
+                                '', 'Favourites', 16, FontWeight.w500,
+                                    () async {
+                                  print('Favourites Tapped');
+                                  var loginID = pkID;
+                                  var moduleID = 13;
+                                  var title =  'Favourites';
+
+                                  await dataProvider.getWeblink(
+                                    loginID ?? 0,
+                                    moduleID,
+                                     0,
+                                     0,
+                                     0,
+                                    0,
+                                    0,
+                                    '',
+                                  );
+
+                                  final result = await Navigator.pushNamed(
+                                    context,
+                                    '/webView',
+                                    arguments: {
+                                      'url': dataProvider.weblinkResponse?.result,
+                                      'webTitle': title
+                                    },
+                                  ).then((_) {
+                                    _checkSessionExpired(dataProvider);
+                                  });
+                                },
+                              ),
+                              Spacer(),
                               _welcomeContainer(
                                 '', 'Subscription', 16, FontWeight.w500,
                                     () async {

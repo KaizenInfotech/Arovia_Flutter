@@ -1150,11 +1150,19 @@ class _ListingPageState extends State<ListingPage> {
                                                            final dataProvider = Provider.of<DataProvider>(context, listen: false);
 
                                                            // Refresh original data depending on login type
-                                                           if (isDoctorLogin) {
-                                                             await dataProvider.getPendingAppointmentListDoctor('', pkid ?? 0);
-                                                             widget.response = dataProvider.pendingAppointmentListDoctorResponse;
-                                                           } else {
-                                                             // ← This is what was missing / incomplete for Assistant
+                                                           // if (isDoctorLogin) {
+                                                           //   await dataProvider.getPendingAppointmentListDoctor('', pkid ?? 0);
+                                                           //   widget.response = dataProvider.pendingAppointmentListDoctorResponse;
+                                                           //
+                                                           //
+                                                           //
+                                                           // }
+                                                            if (isDoctorLogin) {
+                                                            await dataProvider.getAssistant("", pkid ?? 0);
+                                                            setState(() {
+                                                            widget.response = dataProvider.assistantResponse;
+                                                            });}
+                                                           else {
                                                              await dataProvider.getPendingAppointmentListAssistant('', pkid ?? 0);
                                                              widget.response = dataProvider.pendingAppointmentListAssistantResponse;
                                                            }

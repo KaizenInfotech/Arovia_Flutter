@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:arovia/data_model.dart';
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -24,13 +25,17 @@ try {
     );
 
     if (response.statusCode == 200) {
-      print('AUTHTOKENAPI SUCCESSFUL-----------------------------------------');
+      if (kDebugMode) {
+        print('AUTHTOKENAPI SUCCESSFUL-----------------------------------------');
+      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("Failed to login");
   }
 }
@@ -69,13 +74,17 @@ try {
     );
 
     if (response.statusCode == 200) {
-      print('LOGINRESULTAPI SUCCESSFUL-----------------------------------------');
+      if (kDebugMode) {
+        print('LOGINRESULTAPI SUCCESSFUL-----------------------------------------');
+      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("Failed to login");
   }
 }
@@ -106,13 +115,17 @@ try {
     );
 
     if (response.statusCode == 200) {
-      print('SESSIONTIMEOUTAPI SUCCESSFUL-----------------------------------------');
+      if (kDebugMode) {
+        print('SESSIONTIMEOUTAPI SUCCESSFUL-----------------------------------------');
+      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("Failed to login");
   }
 }
@@ -140,13 +153,17 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('USERDETAILAPI SUCCESSFUL-----------------------------------------${response.body}');
+      if (kDebugMode) {
+        print('USERDETAILAPI SUCCESSFUL-----------------------------------------${response.body}');
+      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("Failed to login");
   }
 }
@@ -174,13 +191,17 @@ static Future<Result> logoutAPI(
     );
 
     if (response.statusCode == 200) {
-      print('LOGOUTAPI SUCCESSFUL-----------------------------------------${response.body}');
+      if (kDebugMode) {
+        print('LOGOUTAPI SUCCESSFUL-----------------------------------------${response.body}');
+      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to logout: ${response.statusCode}");
     }
   } catch (e) {
-    print("Error in logoutAPI: $e");
+    if (kDebugMode) {
+      print("Error in logoutAPI: $e");
+    }
     throw Exception("Failed to logout");
   }
 }
@@ -210,13 +231,17 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('APPOINTMENTLISTDOCTORAPI SUCCESSFUL-----------------------------------------${response.body}');
+      if (kDebugMode) {
+        print('APPOINTMENTLISTDOCTORAPI SUCCESSFUL-----------------------------------------${response.body}');
+      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("Failed to login");
   }
 }
@@ -246,15 +271,19 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('APPOINTMENTLISTURl----$url');
-      print('APPOINTMENTLISTPARAM----$requestBody');
-      print('APPOINTMENTLISTASSISTANTAPI SUCCESSFUL-----------------------------------------${response.body}');
+      if (kDebugMode) {
+        print('APPOINTMENTLISTURl----$url');
+        print('APPOINTMENTLISTPARAM----$requestBody');
+        print('APPOINTMENTLISTASSISTANTAPI SUCCESSFUL-----------------------------------------${response.body}');
+      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("Failed to login");
   }
 }
@@ -265,14 +294,19 @@ static Future<Result> pendingAppointmentlistDoctorAPI(
   ) async {
 
   final url = Uri.parse("$baseUrl/Appointment/get_Pending_Appointmentlist_for_Doctor");
-print("fkMemId ::: $fkMemId");
+if (kDebugMode) {
+  print("fkMemId ::: $fkMemId");
+}
   Map<String, dynamic> requestBody = {
   "txt_search": searchText,
   "fk_main_member_master_id_as_doctor_id": fkMemId
 };
 
-  print("pendingAppointmentlistDoctorAPI <<<>>>>  $baseUrl/Appointment/get_Pending_Appointmentlist_for_Doctor");
-  print("pendingAppointmentlistDoctorAPI requestBody <<<>>>>  $requestBody");
+  if (kDebugMode) {
+    print("pendingAppointmentlistDoctorAPI <<<>>>>  $baseUrl/Appointment/get_Pending_Appointmentlist_for_Doctor");
+    print("pendingAppointmentlistDoctorAPI requestBody <<<>>>>  $requestBody");
+  }
+
 
 try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -287,13 +321,17 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('PENDINGAPPOINTMENTLISTDOCTORAPI SUCCESSFUL-----------------------------------------');
+      if (kDebugMode) {
+        print('PENDINGAPPOINTMENTLISTDOCTORAPI SUCCESSFUL-----------------------------------------');
+      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("Failed to login");
   }
 }
@@ -310,8 +348,11 @@ static Future<Result> pendingAppointmentlistAssistantAPI(
   "fk_main_member_master_id_as_Assistant_id": fkMemId
 };
 
-  print("pendingAppointmentlistAssistantAPI :: $url");
-  print("pendingAppointmentlistAssistantAPI requestBody :: $requestBody");
+  if (kDebugMode) {
+    print("pendingAppointmentlistAssistantAPI :: $url");
+    print("pendingAppointmentlistAssistantAPI requestBody :: $requestBody");
+  }
+
 
 try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -326,13 +367,17 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('PENDINGAPPOINTMENTLISTASSISTANTAPI SUCCESSFUL-----------------------------------------${response.body}');
+      if (kDebugMode) {
+        print('PENDINGAPPOINTMENTLISTASSISTANTAPI SUCCESSFUL-----------------------------------------${response.body}');
+      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("Failed to login");
   }
 }
@@ -362,13 +407,17 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('PATIENTLISTDOCTORAPI SUCCESSFUL-----------------------------------------');
+      if (kDebugMode) {
+        print('PATIENTLISTDOCTORAPI SUCCESSFUL-----------------------------------------');
+      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("Failed to login");
   }
 }
@@ -398,13 +447,17 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('PATIENTLISTASSISTANTAPI SUCCESSFUL-----------------------------------------');
+      if (kDebugMode) {
+        print('PATIENTLISTASSISTANTAPI SUCCESSFUL-----------------------------------------');
+      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("Failed to login");
   }
 }
@@ -436,13 +489,17 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('SEARCHAPPOINTMENTDOCTORAPI SUCCESSFUL-----------------------------------------');
+      if (kDebugMode) {
+        print('SEARCHAPPOINTMENTDOCTORAPI SUCCESSFUL-----------------------------------------');
+      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("Failed to login");
   }
 }
@@ -472,13 +529,17 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('SEARCHAPPOINTMENTASSISTANTAPI SUCCESSFUL-----------------------------------------');
+      if (kDebugMode) {
+        print('SEARCHAPPOINTMENTASSISTANTAPI SUCCESSFUL-----------------------------------------');
+      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("Failed to login");
   }
 }
@@ -510,13 +571,17 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('CANCELAPPOINTMENTAPI SUCCESSFUL-----------------------------------------');
+      if (kDebugMode) {
+        print('CANCELAPPOINTMENTAPI SUCCESSFUL-----------------------------------------');
+      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("Failed to login");
   }
 }
