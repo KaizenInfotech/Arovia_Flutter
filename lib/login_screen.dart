@@ -150,13 +150,30 @@ class _LoginScreenState extends State<LoginScreen> {
       final pkMainId = dataProvider.loginResponse?.pkMainMemberMasterId ?? 0;
       final status = dataProvider.loginResponse?.status ?? 0;
 
+      debugPrint('''
+------ LOGIN DEBUG ------
+Phone            : ${_phoneController.text}
+Member Type      : ${widget.memType}
+Device Name      : $deviceName
+Device Version   : $deviceVersion
+IMEI             : $imei
+Device Token     : $deviceToken
+
+--- API RESPONSE ---
+OTP              : $otp
+Member ID        : $pkMainId
+Status           : $status
+-----------------------
+''');
+
+
       if (status == "0") {
         Navigator.pushNamed(
           context,
           '/otpscreen',
           arguments: {
             'username': otp,
-            'phn': _phoneController.text, //7
+            'phn': _phoneController.text,
             'phnName': deviceName,
             'phnVersion': deviceVersion,
             'imei': imei,
@@ -175,6 +192,7 @@ class _LoginScreenState extends State<LoginScreen> {
       print('Phone: ${_phoneController.text}');
       print('OTP: $otp');
       print('pkMainMemberMasterId: $pkMainId');
+      print('STATUS: $status');
       print('STATUS: $status');
     }
   }

@@ -78,6 +78,90 @@ void showLogoutPopup({
                         ),
                       ),
                       const SizedBox(width: 10),
+                      // Expanded(
+                      //   child: ElevatedButton(
+                      //     onPressed: isLoading
+                      //         ? null
+                      //         : () async {
+                      //       setState(() {
+                      //         isLoading = true;
+                      //       });
+                      //
+                      //       final dataProvider = Provider.of<DataProvider>(
+                      //           dialogContext,
+                      //           listen: false);
+                      //
+                      //       var pkId = dataProvider.loginResponse?.pkMainMemberMasterId;
+                      //       print("<<<pkId ::>>> $pkId");
+                      //
+                      //       try {
+                      //         await dataProvider.getLogout(
+                      //           pkId ?? 0,
+                      //         );
+                      //
+                      //         // Check the actual logout response, not loginResponse!
+                      //         final logoutStatus = dataProvider.logoutResponse?.status; // assuming you have logoutResponse
+                      //         final logoutMessage = dataProvider.logoutResponse?.message ?? "Logout failed";
+                      //
+                      //
+                      //         if (logoutStatus == "0" || logoutStatus == 0) {
+                      //             Navigator.of(dialogContext).pop(); // close popup
+                      //             Navigator.pushReplacementNamed(dialogContext, '/welcome');
+                      //             final SharedPreferences prefs = await SharedPreferences.getInstance();
+                      //             await prefs.remove('auth_token');
+                      //             await prefs.remove('isDoctorLogin');
+                      //             await prefs.remove('pkID');
+                      //             await prefs.remove('mem_ID');
+                      //             await prefs.remove('imei');
+                      //             if (kDebugMode) {
+                      //               print("logoutStatus :: $logoutStatus");
+                      //             }
+                      //         } else {
+                      //             ScaffoldMessenger.of(dialogContext).showSnackBar(
+                      //               SnackBar(content: Text(logoutMessage)),
+                      //             );
+                      //
+                      //         }
+                      //       } catch (e) {
+                      //         if (dialogContext.mounted) {
+                      //           ScaffoldMessenger.of(dialogContext).showSnackBar(
+                      //             const SnackBar(content: Text("Network error during logout")),
+                      //           );
+                      //         }
+                      //       } finally {
+                      //         if (dialogContext.mounted) {
+                      //           setState(() => isLoading = false);
+                      //         }
+                      //       }
+                      //     },
+                      //     style: ElevatedButton.styleFrom(
+                      //       backgroundColor: const Color(0xFF1B2843),
+                      //       padding: const EdgeInsets.symmetric(vertical: 10),
+                      //       shape: RoundedRectangleBorder(
+                      //         borderRadius: BorderRadius.circular(10),
+                      //       ),
+                      //     ),
+                      //     child: isLoading
+                      //         ? const SizedBox(
+                      //       height: 20,
+                      //       width: 20,
+                      //       child: CircularProgressIndicator(
+                      //         color: Colors.white,
+                      //         strokeWidth: 2,
+                      //       ),
+                      //     )
+                      //         : const Text(
+                      //       'Log out',
+                      //       style: TextStyle(
+                      //         color: Colors.white,
+                      //         fontSize: 17,
+                      //         fontFamily: 'Work Sans',
+                      //         fontWeight: FontWeight.w700,
+                      //       ),
+                      //     ),
+                      //   ),
+                      // ),
+
                       Expanded(
                         child: ElevatedButton(
                           onPressed: isLoading
@@ -88,42 +172,75 @@ void showLogoutPopup({
                             });
 
                             final dataProvider = Provider.of<DataProvider>(
-                                dialogContext,
-                                listen: false);
+                              dialogContext,
+                              listen: false,
+                            );
 
+                            // Get pkId from loginResponse OR fallback to SharedPreferences
+                            int? pkIdFromLogin = dataProvider.loginResponse?.pkMainMemberMasterId;
+                            final SharedPreferences prefs = await SharedPreferences.getInstance();
+                            int? pkIdFromPrefs = prefs.getInt('mem_ID');
+
+                            final int pkId = pkIdFromLogin ?? pkIdFromPrefs ?? 0;
+
+                            print("<<< Attempting logout with pkId ::>>> $pkId");
+
+                            // === VALIDATION: Check if pkId is valid ===
+                            if (pkId <= 0) {
+                              ScaffoldMessenger.of(dialogContext).showSnackBar(
+                                const SnackBar(
+                                  content: Text("Unable to logout: User session data missing. Please login again."),
+                                  backgroundColor: Colors.red,
+                                ),
+                              );
+                              setState(() => isLoading = false);
+                              return; // Exit early
+                            }
 
                             try {
-                              await dataProvider.getLogout(
-                                dataProvider.loginResponse?.pkMainMemberMasterId ?? 0,
-                              );
+                              await dataProvider.getLogout(pkId);
 
-                              // Check the actual logout response, not loginResponse!
-                              final logoutStatus = dataProvider.logoutResponse?.status; // assuming you have logoutResponse
+                              final logoutStatus = dataProvider.logoutResponse?.status;
                               final logoutMessage = dataProvider.logoutResponse?.message ?? "Logout failed";
 
+                              print("Logout API Response - Status: $logoutStatus, Message: $logoutMessage");
 
                               if (logoutStatus == "0" || logoutStatus == 0) {
-                                  Navigator.of(dialogContext).pop(); // close popup
-                                  Navigator.pushReplacementNamed(dialogContext, '/welcome');
-                                  final SharedPreferences prefs = await SharedPreferences.getInstance();
-                                  await prefs.remove('auth_token');
-                                  await prefs.remove('isDoctorLogin');
-                                  await prefs.remove('pkID');
-                                  await prefs.remove('mem_ID');
-                                  await prefs.remove('imei');
-                                  if (kDebugMode) {
-                                    print("logoutStatus :: $logoutStatus");
-                                  }
-                              } else {
-                                  ScaffoldMessenger.of(dialogContext).showSnackBar(
-                                    SnackBar(content: Text(logoutMessage)),
-                                  );
+                                // Success: Close dialog and go to welcome screen
+                                if (dialogContext.mounted) {
+                                  Navigator.of(dialogContext).pop(); // Close logout popup
+                                }
+                                Navigator.pushReplacementNamed(dialogContext, '/welcome');
 
+                                // Clear all stored data
+                                await prefs.clear(); // Or selectively remove keys
+                                // Alternatively:
+                                // await prefs.remove('auth_token');
+                                // await prefs.remove('isDoctorLogin');
+                                // await prefs.remove('pkID');
+                                // await prefs.remove('mem_ID');
+                                // await prefs.remove('imei');
+
+                                if (kDebugMode) {
+                                  print("Logout successful :: $logoutStatus");
+                                }
+                              } else {
+                                // API returned failure (status "1")
+                                ScaffoldMessenger.of(dialogContext).showSnackBar(
+                                  SnackBar(
+                                    content: Text(logoutMessage),
+                                    backgroundColor: Colors.orange,
+                                  ),
+                                );
                               }
                             } catch (e) {
+                              print("Logout exception: $e");
                               if (dialogContext.mounted) {
                                 ScaffoldMessenger.of(dialogContext).showSnackBar(
-                                  const SnackBar(content: Text("Network error during logout")),
+                                  const SnackBar(
+                                    content: Text("Network error during logout. Please try again."),
+                                    backgroundColor: Colors.red,
+                                  ),
                                 );
                               }
                             } finally {

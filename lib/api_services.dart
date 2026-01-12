@@ -271,6 +271,9 @@ print("fkMemId ::: $fkMemId");
   "fk_main_member_master_id_as_doctor_id": fkMemId
 };
 
+  print("pendingAppointmentlistDoctorAPI <<<>>>>  $baseUrl/Appointment/get_Pending_Appointmentlist_for_Doctor");
+  print("pendingAppointmentlistDoctorAPI requestBody <<<>>>>  $requestBody");
+
 try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
@@ -306,6 +309,9 @@ static Future<Result> pendingAppointmentlistAssistantAPI(
   "txt_search": searchText,
   "fk_main_member_master_id_as_Assistant_id": fkMemId
 };
+
+  print("pendingAppointmentlistAssistantAPI :: $url");
+  print("pendingAppointmentlistAssistantAPI requestBody :: $requestBody");
 
 try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -805,6 +811,9 @@ static Future<Result> assistantAPI(
   "txt_search": searchText
 };
 
+  print("assistantAPI ::: $baseUrl/Assistant/get_assistant_list_for_Doctor");
+  print("assistantAPI requestBody ::: $requestBody");
+
 try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
@@ -888,6 +897,9 @@ static Future<Weblink> weblinkAPI(
     "fk_document_id": documentID,
     "mobile_number": phnNo
 };
+
+  print("weblinkAPI <<<>>>>  $baseUrl/Login/Web_login_from_Mobile");
+  print("weblinkAPI requestBody <<<>>>>  $requestBody");
 
 try {
     SharedPreferences prefs = await SharedPreferences.getInstance();

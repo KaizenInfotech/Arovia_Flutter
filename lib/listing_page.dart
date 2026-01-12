@@ -136,6 +136,30 @@ class _ListingPageState extends State<ListingPage> {
     itemResponseCount = widget.response?.result.length ?? 0;
   }
 
+
+  Future<void> _refreshListData(DataProvider dataProvider, String searchText) async {
+    print("_refreshListData isDoctorLogin :: $isDoctorLogin");
+    // Refresh the appointment list
+    if (isDoctorLogin) {
+      // await dataProvider.getPendingAppointmentListDoctor('', pkid ?? 0);
+      await dataProvider.getAssistant("", pkid ?? 0);
+      setState(() {
+        // widget.response = dataProvider.pendingAppointmentListDoctorResponse;
+        widget.response = dataProvider.assistantResponse;
+      });
+    } else {
+     await dataProvider.getPendingAppointmentListAssistant('', pkid ?? 0);
+      setState(() {
+        widget.response = dataProvider.pendingAppointmentListAssistantResponse;
+      });
+    }
+    if (mounted) {
+      setState(() {
+        selectedIndex = null;
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
@@ -552,11 +576,19 @@ class _ListingPageState extends State<ListingPage> {
                                             if (result == true && mounted) {
                                               // Refresh the appropriate list
                                               if (widget.headtitle == 'Scheduled Appointment') {
-                                                await dataProvider.getPendingAppointmentListDoctor('', pkid ?? 0);
-                                                // Or use assistant version if needed
-                                                setState(() {
-                                                  widget.response = dataProvider.pendingAppointmentListDoctorResponse;
-                                                });
+                                                if(isDoctorLogin){
+                                                  await dataProvider.getPendingAppointmentListDoctor('', pkid ?? 0);
+                                                  // Or use assistant version if needed
+                                                  setState(() {
+                                                    widget.response = dataProvider.pendingAppointmentListDoctorResponse;
+                                                  });
+                                                }else{
+                                                  await dataProvider.getPendingAppointmentListAssistant('', pkid ?? 0);
+                                                  // Or use assistant version if needed
+                                                  setState(() {
+                                                    widget.response = dataProvider.pendingAppointmentListAssistantResponse;
+                                                  });
+                                                }
                                               } else if (widget.headtitle == 'Assistant') {
                                                 await dataProvider.getAssistant('', pkid ?? 0);
                                                 setState(() {
@@ -663,12 +695,26 @@ class _ListingPageState extends State<ListingPage> {
                                             );
 
                                             if (result == true && mounted) {
+                                              print("isDoctorLogin :: $isDoctorLogin");
                                               if (widget.headtitle == 'Scheduled Appointment') {
-                                                await dataProvider.getPendingAppointmentListDoctor('', pkid ?? 0);
-                                                // Or assistant version
-                                                setState(() {
-                                                  widget.response = dataProvider.pendingAppointmentListDoctorResponse;
-                                                });
+                                                // await dataProvider.getPendingAppointmentListDoctor('', pkid ?? 0);
+                                                // // Or assistant version
+                                                // setState(() {
+                                                //   widget.response = dataProvider.pendingAppointmentListDoctorResponse;
+                                                // });
+                                                if(isDoctorLogin){
+                                                  await dataProvider.getPendingAppointmentListDoctor('', pkid ?? 0);
+                                                  // Or use assistant version if needed
+                                                  setState(() {
+                                                    widget.response = dataProvider.pendingAppointmentListDoctorResponse;
+                                                  });
+                                                }else{
+                                                  await dataProvider.getPendingAppointmentListAssistant('', pkid ?? 0);
+                                                  // Or use assistant version if needed
+                                                  setState(() {
+                                                    widget.response = dataProvider.pendingAppointmentListAssistantResponse;
+                                                  });
+                                                }
                                               } else if (widget.headtitle == 'Assistant') {
                                                 await dataProvider.getAssistant('', pkid ?? 0);
                                                 setState(() {
@@ -879,7 +925,8 @@ class _ListingPageState extends State<ListingPage> {
                                                                           'Scheduled Appointment') ||
                                                                       widget.headtitle ==
                                                                           'Pending Payments')
-                                                                  ? status[index]
+                                                                  ?
+                                                          status[index]
                                                                           ?.patiantName ??
                                                                       ''
                                                                   : widget
@@ -1002,7 +1049,7 @@ class _ListingPageState extends State<ListingPage> {
                                                     // if ((widget.headtitle != 'Appointment') && (widget.headtitle != 'Assistant'))
                                                     GestureDetector(
                                                       onTap: () {
-                                                        setState(() {
+                                                        setState(() async {
                                                           selectedIndex = index;
                                                           if (widget.headtitle == 'Completed Appointment' ||
                                                               widget.headtitle ==
@@ -1043,9 +1090,7 @@ class _ListingPageState extends State<ListingPage> {
                                                                     .pkMainMemberMasterId ??
                                                                 0;
                                                           }
-                                                          if (widget
-                                                                  .headtitle ==
-                                                              'Patients') {
+                                                          if (widget.headtitle == 'Patients') {
                                                             patientID = widget
                                                                     .response
                                                                     ?.result[
@@ -1087,7 +1132,7 @@ class _ListingPageState extends State<ListingPage> {
                                                                   'patientName': patientName
                                                                 });
                                                           } else {
-                                                            Navigator.pushNamed(
+                                                         final result = await Navigator.pushNamed(
                                                                 context,
                                                                 '/detailScreen',
                                                                 arguments: {
@@ -1101,6 +1146,26 @@ class _ListingPageState extends State<ListingPage> {
                                                                   'status':
                                                                       status
                                                                 });
+                                                         if (result == true && mounted) {
+                                                           final dataProvider = Provider.of<DataProvider>(context, listen: false);
+
+                                                           // Refresh original data depending on login type
+                                                           if (isDoctorLogin) {
+                                                             await dataProvider.getPendingAppointmentListDoctor('', pkid ?? 0);
+                                                             widget.response = dataProvider.pendingAppointmentListDoctorResponse;
+                                                           } else {
+                                                             // ← This is what was missing / incomplete for Assistant
+                                                             await dataProvider.getPendingAppointmentListAssistant('', pkid ?? 0);
+                                                             widget.response = dataProvider.pendingAppointmentListAssistantResponse;
+                                                           }
+
+                                                           // Re-apply filter with current search text
+                                                           _filteredData(searchController.text);
+
+                                                           setState(() {
+                                                             selectedIndex = null;
+                                                           });
+                                                         }
                                                           }
                                                         });
                                                         debugPrint(

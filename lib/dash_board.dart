@@ -274,76 +274,148 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
     }
   }
 
+  // Future<void> _getID() async {
+  //   final SharedPreferences prefs = await SharedPreferences.getInstance();
+  //   await prefs.setInt('isFirstLaunch', 1);
+  //   pkID = prefs.getInt('mem_ID') ?? 0;
+  //   imei = prefs.getString('imei') ?? '';
+  //   isDoctorLogin = prefs.getBool('isDoctorLogin') ?? false;
+  //   await prefs.setInt('pkID', pkID);
+  //
+  //   print('pkID ---------$pkID');
+  //   print('imei ---------$imei');
+  //
+  //   final dataProvider = Provider.of<DataProvider>(context, listen: false);
+  //
+  //   _checkSessionExpired(dataProvider);
+  //
+  //   await dataProvider.getUserDetail(pkID);
+  //   final userDetail = dataProvider.userDetailResponse;
+  //
+  //   if (userDetail != null && userDetail.result.isNotEmpty) {
+  //     setState(() {
+  //       profilePhoto = userDetail.result.first.profilePhoto ?? '';
+  //       firstName = userDetail.result.first.firstName ?? '';
+  //       lastName = userDetail.result.first.lastName ?? '';
+  //     });
+  //     fkID = userDetail.result.first.fkMainMemberMasterIdAsDoctorId ?? 0;
+  //     print('fkID ---------$fkID');
+  //     print('profilePhoto ---------$profilePhoto');
+  //     print('firstName ---------$firstName');
+  //     print('lastName ---------$lastName');
+  //     await prefs.setInt('fk_Id', fkID);
+  //
+  //     mobileNo = userDetail.result.first.mobileNumber ?? '';
+  //     print('mobileNo ---------$mobileNo');
+  //
+  //     memberType = userDetail.result.first.membertype ?? '';
+  //     print('memberType ---------$memberType');
+  //
+  //     // Fetch appointment data based on member type
+  //     if (memberType == 'Doctor') {
+  //       await _fetchDoctorAppointments(dataProvider);
+  //     } else {
+  //       await _fetchAssistantAppointments(dataProvider);
+  //     }
+  //     await dataProvider.getAppointmentDetails(fkID);
+  //   }
+  //
+  //   if (memberType == 'Doctor') {
+  //     await dataProvider.getSubscriptionPayment(pkID);
+  //        final link = dataProvider.subscriptionPaymentResponse?.paymentlink ?? '';
+  //         await dataProvider.getSubscriptionActiveDoctorAPI(pkID);
+  //         final subscriptionCheck = dataProvider.subscriptionActiveDoctorResponse;
+  //
+  //         if (subscriptionCheck?.message == "Expired") {
+  //           setState(() {
+  //             _subscriptionCheck(link);
+  //           });
+  //         }
+  //
+  //   } else {
+  //       await dataProvider.getSubscriptionPayment(pkID);
+  //        final link = dataProvider.subscriptionPaymentResponse?.paymentlink ?? '';
+  //         await dataProvider.getSubscriptionActiveAssistantAPI(pkID);
+  //         final subscriptionCheck = dataProvider.subscriptionActiveAssistantResponse;
+  //
+  //         if (subscriptionCheck?.message == "Expired") {
+  //           setState(() {
+  //             _subscriptionCheck(link);
+  //           });
+  //         }
+  //
+  //   }
+  // }
+
   Future<void> _getID() async {
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setInt('isFirstLaunch', 1);
+    final prefs = await SharedPreferences.getInstance();
     pkID = prefs.getInt('mem_ID') ?? 0;
     imei = prefs.getString('imei') ?? '';
     isDoctorLogin = prefs.getBool('isDoctorLogin') ?? false;
-    await prefs.setInt('pkID', pkID);
-
-    print('pkID ---------$pkID');
-    print('imei ---------$imei');
 
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
 
-    _checkSessionExpired(dataProvider);
+    // 1. First — always check session (highest priority)
+    await dataProvider.getSessionTimeOut(pkID, imei);
+    final sessionStatus = dataProvider.sessionTimeOutResponse?.status ?? '0';
 
+    if (sessionStatus != '0') {
+      _checkSessionExpired(dataProvider); // this will show dialog + navigate away
+      return; // ← VERY IMPORTANT: stop here!
+    }
+
+    // 2. Only if session is valid → continue with other checks
     await dataProvider.getUserDetail(pkID);
     final userDetail = dataProvider.userDetailResponse;
 
-    if (userDetail != null && userDetail.result.isNotEmpty) {
-      setState(() {
-        profilePhoto = userDetail.result.first.profilePhoto ?? '';
-        firstName = userDetail.result.first.firstName ?? '';
-        lastName = userDetail.result.first.lastName ?? '';
-      });
-      fkID = userDetail.result.first.fkMainMemberMasterIdAsDoctorId ?? 0;
-      print('fkID ---------$fkID');
-      print('profilePhoto ---------$profilePhoto');
-      print('firstName ---------$firstName');
-      print('lastName ---------$lastName');
-      await prefs.setInt('fk_Id', fkID);
-
-      mobileNo = userDetail.result.first.mobileNumber ?? '';
-      print('mobileNo ---------$mobileNo');
-
-      memberType = userDetail.result.first.membertype ?? '';
-      print('memberType ---------$memberType');
-
-      // Fetch appointment data based on member type
-      if (memberType == 'Doctor') {
-        await _fetchDoctorAppointments(dataProvider);
-      } else {
-        await _fetchAssistantAppointments(dataProvider);
-      }
-      await dataProvider.getAppointmentDetails(fkID);
+    if (userDetail == null || userDetail.result.isEmpty) {
+      return;
     }
 
+    // Update UI state
+    setState(() {
+      profilePhoto = userDetail.result.first.profilePhoto ?? '';
+      firstName = userDetail.result.first.firstName ?? '';
+      lastName = userDetail.result.first.lastName ?? '';
+      // ... other fields
+    });
+
+    fkID = userDetail.result.first.fkMainMemberMasterIdAsDoctorId ?? 0;
+    mobileNo = userDetail.result.first.mobileNumber ?? '';
+    memberType = userDetail.result.first.membertype ?? '';
+
+    // 3. Only now check subscription (after confirming session is valid)
+    await _checkAndShowSubscriptionIfNeeded(dataProvider);
+
+    // 4. Load appointment/patient data only if everything is fine
     if (memberType == 'Doctor') {
-      await dataProvider.getSubscriptionPayment(pkID);
-         final link = dataProvider.subscriptionPaymentResponse?.paymentlink ?? '';
-          await dataProvider.getSubscriptionActiveDoctorAPI(pkID);
-          final subscriptionCheck = dataProvider.subscriptionActiveDoctorResponse;
-
-          if (subscriptionCheck?.message == "Expired") {
-            setState(() {
-              _subscriptionCheck(link);
-            });
-          }
-
+      await _fetchDoctorAppointments(dataProvider);
     } else {
-        await dataProvider.getSubscriptionPayment(pkID);
-         final link = dataProvider.subscriptionPaymentResponse?.paymentlink ?? '';
-          await dataProvider.getSubscriptionActiveAssistantAPI(pkID);
-          final subscriptionCheck = dataProvider.subscriptionActiveAssistantResponse;
+      await _fetchAssistantAppointments(dataProvider);
+    }
+    await dataProvider.getAppointmentDetails(fkID);
+  }
 
-          if (subscriptionCheck?.message == "Expired") {
-            setState(() {
-              _subscriptionCheck(link);
-            });
-          }
+  Future<void> _checkAndShowSubscriptionIfNeeded(DataProvider dataProvider) async {
+    if (_isSubscriptionPopupShown) return;
 
+    String? paymentLink;
+
+    await dataProvider.getSubscriptionPayment(pkID);
+    paymentLink = dataProvider.subscriptionPaymentResponse?.paymentlink ?? '';
+
+    dynamic subscriptionCheck;
+
+    if (memberType == 'Doctor') {
+      await dataProvider.getSubscriptionActiveDoctorAPI(pkID);
+      subscriptionCheck = dataProvider.subscriptionActiveDoctorResponse;
+    } else {
+      await dataProvider.getSubscriptionActiveAssistantAPI(pkID);
+      subscriptionCheck = dataProvider.subscriptionActiveAssistantResponse;
+    }
+
+    if (subscriptionCheck?.message == "Expired") {
+      _subscriptionCheck(paymentLink);
     }
   }
 
@@ -398,31 +470,8 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
                   child:GreetingHeader(
                     firstName: firstName,
                     lastName: lastName,
-                    memberType: memberType, // or "Patient", "Nurse", etc.
+                    memberType: memberType,
                   ),
-
-                  // Column(
-                  //   crossAxisAlignment: CrossAxisAlignment.start,
-                  //   children: [
-                  //     const Text(
-                  //       "Hi, Welcome Back,",
-                  //       style: TextStyle(
-                  //         fontSize: 16,
-                  //         color: Color(0xFF858585),
-                  //       ),
-                  //     ),
-                  //     const SizedBox(height: 4),
-                  //     Text(
-                  //       (memberType == 'Doctor') ? "Dr. $firstName $lastName"
-                  //       : "$firstName $lastName",
-                  //       style: const TextStyle(
-                  //         fontSize: 18,
-                  //         fontWeight: FontWeight.w600,
-                  //         color: Colors.black,
-                  //       ),maxLines: 2,
-                  //     ),
-                  //   ],
-                  // ),
                 ),
                 // const Icon(Icons.notifications_none, size: 28, color: Colors.black),
        GestureDetector(
@@ -437,11 +486,9 @@ final dataProvider = Provider.of<DataProvider>(context, listen: false);
  await dataProvider.getSessionTimeOut(currentPkID, currentImei);
  final sessionStatus = dataProvider.sessionTimeOutResponse?.status ?? '0';
 
- // If session is expired or invalid (-1 or -2), do NOT show logout popup
  if (sessionStatus != '0') {
-// _checkSessionExpired already handles showing the expiration dialog and logout
 _checkSessionExpired(dataProvider);
-return; // Exit early — don't show logout popup
+return;
 }
 
  // Session is valid → safe to show logout confirmation popup
@@ -456,208 +503,388 @@ padding: const EdgeInsets.only(left: 5.0),
             ),
           ),
           backgroundColor: const Color.fromRGBO(251, 246, 227, 1),
-          body: Consumer<DataProvider>(builder: (context, dataProvider, child) {
-            return Column(
-              children: [
-                const SizedBox(
-                  height: 50,
-                ),
-                Expanded(
-                    child: Padding(
+          // body: Consumer<DataProvider>(builder: (context, dataProvider, child) {
+          //   return RefreshIndicator(
+          //     onRefresh: () {
+          //       print("<<<<<<<<<<<<< User Data Refreshed >>>>>>>>>>>>>");
+          //      return _getID();
+          //     },
+          //     child: SingleChildScrollView(
+          //       child: Column(
+          //         children: [
+          //           const SizedBox(
+          //             height: 50,
+          //           ),
+          //           Expanded(
+          //               child: Padding(
+          //             padding: const EdgeInsets.all(16.0),
+          //             child: SingleChildScrollView(
+          //               child: Column(
+          //                 children: [
+          //                   Padding(
+          //                     padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
+          //                     child: Row(
+          //                       children: [
+          //                         _welcomeContainer(
+          //                             '', 'Appointment', 16, FontWeight.w500,
+          //                             () async {
+          //                           print('Appointment Tapped');
+          //                           if (isDoctorLogin) {
+          //                             await dataProvider.getAppointmentListDoctor(
+          //                                 '', pkID);
+          //                             response =
+          //                                 dataProvider.appointmentListDoctorResponse;
+          //                           } else {
+          //                             await dataProvider.getAppointmentListAssistant(
+          //                                 '', pkID);
+          //                             response = dataProvider
+          //                                 .appointmentListAssistantResponse;
+          //                           }
+          //                           Navigator.pushNamed(
+          //                               context, '/appointmentDetailPage',
+          //                               arguments: {
+          //                                 'loginType': isDoctorLogin,
+          //                                 'pkID': pkID,
+          //                                 'respon': response
+          //                               }).then((_) {
+          //                             _checkSessionExpired(dataProvider);
+          //                           });
+          //                         }),
+          //                         const SizedBox(
+          //                           width: 8.0,
+          //                         ),
+          //                         _welcomeContainer(
+          //                             '', 'Pending\nPayments', 16, FontWeight.w500,
+          //                             () async {
+          //                           print('Pending Payments Tapped');
+          //                           if (isDoctorLogin) {
+          //                             await dataProvider
+          //                                 .getPendingAppointmentListDoctor('', pkID);
+          //                             response = dataProvider
+          //                                 .pendingAppointmentListDoctorResponse;
+          //                           } else {
+          //                             await dataProvider
+          //                                 .getPendingAppointmentListAssistant(
+          //                                     '', pkID);
+          //                             response = dataProvider
+          //                                 .pendingAppointmentListAssistantResponse;
+          //                           }
+          //                           // Navigator.pushNamed(context, '/listingPagescreen',
+          //                           //     arguments: {
+          //                           //       'headTitle': 'Pending Payments',
+          //                           //       'response': response
+          //                           //     })
+          //                           Navigator.of(context)
+          //                               .push(
+          //                             MaterialPageRoute(
+          //                               builder: (context) => ListingPage(
+          //                                 headtitle: 'Pending Payments',
+          //                                 response: response, // full Result object
+          //                                 subscripPayment: null,
+          //                               ),
+          //                             ),
+          //                           )
+          //                               .then((_) {
+          //                             _checkSessionExpired(dataProvider);
+          //                           });
+          //                         }),
+          //                       ],
+          //                     ),
+          //                   ),
+          //                   Padding(
+          //                     padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+          //                     child: Row(
+          //                       mainAxisAlignment: isDoctorLogin
+          //                           ? MainAxisAlignment.start
+          //                           : MainAxisAlignment.center,
+          //                       children: [
+          //
+          //                           _welcomeContainer(
+          //                               '', 'Patients', 16, FontWeight.w500,
+          //                               () async {
+          //                             print('Patients Tapped');
+          //                             if (isDoctorLogin) {
+          //                               await dataProvider.getPatientListDoctor(
+          //                                   '', pkID);
+          //                               response =
+          //                                   dataProvider.patientListDoctorResponse;
+          //                             } else {
+          //                               await dataProvider.getPatientListAssistant(
+          //                                   '', pkID);
+          //                               response =
+          //                                   dataProvider.patientListAssistantResponse;
+          //                             }
+          //                             // Navigator.pushNamed(
+          //                             //     context, '/listingPagescreen', arguments: {
+          //                             //   'headTitle': 'Patients',
+          //                             //   'response': response
+          //                             // })
+          //                             Navigator.of(context)
+          //                                 .push(
+          //                               MaterialPageRoute(
+          //                                 builder: (context) => ListingPage(
+          //                                   headtitle: 'Patients',
+          //                                   response: response, // full Result object
+          //                                   subscripPayment: null,
+          //                                 ),
+          //                               ),
+          //                             )
+          //                                 .then((_) {
+          //                               _checkSessionExpired(dataProvider);
+          //                             });
+          //                           }),
+          //                         const SizedBox(
+          //                           width: 8.0,
+          //                         ),
+          //                         if (isDoctorLogin)
+          //                         _welcomeContainer(
+          //                             '', 'Assistant', 16, FontWeight.w500, () async {
+          //                           print('Assistant Tapped');
+          //                           await dataProvider.getAssistant('', pkID);
+          //                           response = dataProvider.assistantResponse;
+          //                           // Navigator.pushNamed(context, '/listingPagescreen',
+          //                           //     arguments: {
+          //                           //       'headTitle': 'Assistant',
+          //                           //       'response': response
+          //                           //     })
+          //                           Navigator.of(context)
+          //                               .push(
+          //                             MaterialPageRoute(
+          //                               builder: (context) => ListingPage(
+          //                                 headtitle: 'Assistant',
+          //                                 response: response, // full Result object
+          //                                 subscripPayment: null,
+          //                               ),
+          //                             ),
+          //                           )
+          //                               .then((_) {
+          //                             _checkSessionExpired(dataProvider);
+          //                           });
+          //                         }),
+          //                       ],
+          //                     ),
+          //                   ),
+          //                   if (isDoctorLogin)
+          //                     Padding(
+          //                       padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+          //                       child: Row(
+          //                         mainAxisAlignment: MainAxisAlignment.center,
+          //                         children: [
+          //                           _welcomeContainer(
+          //                               '', 'Subscription', 16, FontWeight.w500,
+          //                               () async {
+          //                             print('Subscription Tapped');
+          //                             await dataProvider.getSubscriptionPayment(pkID);
+          //                             final link = dataProvider
+          //                                     .subscriptionPaymentResponse
+          //                                     ?.paymentlink ??
+          //                                 '';
+          //                             await dataProvider.getSubscription(pkID);
+          //                             response = dataProvider.subscriptionResponse;
+          //                             // Navigator.pushNamed(
+          //                             //     context, '/listingPagescreen', arguments: {
+          //                             //   'headTitle': 'Subscription',
+          //                             //   'response': response,
+          //                             //   'subsLink': link
+          //                             // })
+          //                             Navigator.of(context)
+          //                                 .push(
+          //                               MaterialPageRoute(
+          //                                 builder: (context) => ListingPage(
+          //                                   headtitle: 'Subscription',
+          //                                   response: response, // full Result object
+          //                                   subscripPayment: link,
+          //                                 ),
+          //                               ),
+          //                             )
+          //                                 .then((_) {
+          //                               _checkSessionExpired(dataProvider);
+          //                             });
+          //                           }),
+          //                         ],
+          //                       ),
+          //                     ),
+          //                 ],
+          //               ),
+          //             ),
+          //           ))
+          //         ],
+          //       ),
+          //     ),
+          //   );
+          // })),
+        body: Consumer<DataProvider>(
+          builder: (context, dataProvider, child) {
+            return RefreshIndicator(
+              onRefresh: () async {
+                print("<<<<<<<<<<<<< User Data Refreshed >>>>>>>>>>>>>");
+                await _getID();
+              },
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(), // Important for RefreshIndicator
+                child: Padding(
                   padding: const EdgeInsets.all(16.0),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
-                          child: Row(
-                            children: [
-                              _welcomeContainer(
-                                  '', 'Appointment', 16, FontWeight.w500,
+                  child: Column(
+                    children: [
+                      const SizedBox(height: 50),
+
+                      // Appointment Row
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16.0, bottom: 8.0),
+                        child: Row(
+                          children: [
+                            _welcomeContainer(
+                              '', 'Appointment', 16, FontWeight.w500,
                                   () async {
                                 print('Appointment Tapped');
                                 if (isDoctorLogin) {
-                                  await dataProvider.getAppointmentListDoctor(
-                                      '', pkID);
-                                  response =
-                                      dataProvider.appointmentListDoctorResponse;
+                                  await dataProvider.getAppointmentListDoctor('', pkID);
+                                  response = dataProvider.appointmentListDoctorResponse;
                                 } else {
-                                  await dataProvider.getAppointmentListAssistant(
-                                      '', pkID);
-                                  response = dataProvider
-                                      .appointmentListAssistantResponse;
+                                  await dataProvider.getAppointmentListAssistant('', pkID);
+                                  response = dataProvider.appointmentListAssistantResponse;
                                 }
                                 Navigator.pushNamed(
-                                    context, '/appointmentDetailPage',
-                                    arguments: {
-                                      'loginType': isDoctorLogin,
-                                      'pkID': pkID,
-                                      'respon': response
-                                    }).then((_) {
+                                  context, '/appointmentDetailPage',
+                                  arguments: {
+                                    'loginType': isDoctorLogin,
+                                    'pkID': pkID,
+                                    'respon': response
+                                  },
+                                ).then((_) {
                                   _checkSessionExpired(dataProvider);
                                 });
-                              }),
-                              const SizedBox(
-                                width: 8.0,
-                              ),
-                              _welcomeContainer(
-                                  '', 'Pending\nPayments', 16, FontWeight.w500,
+                              },
+                            ),
+                            const SizedBox(width: 8.0),
+                            _welcomeContainer(
+                              '', 'Pending\nPayments', 16, FontWeight.w500,
                                   () async {
                                 print('Pending Payments Tapped');
                                 if (isDoctorLogin) {
-                                  await dataProvider
-                                      .getPendingAppointmentListDoctor('', pkID);
-                                  response = dataProvider
-                                      .pendingAppointmentListDoctorResponse;
+                                  await dataProvider.getPendingAppointmentListDoctor('', pkID);
+                                  response = dataProvider.pendingAppointmentListDoctorResponse;
+                                  print("Pending Payments Tapped :: $response");
                                 } else {
-                                  await dataProvider
-                                      .getPendingAppointmentListAssistant(
-                                          '', pkID);
-                                  response = dataProvider
-                                      .pendingAppointmentListAssistantResponse;
+                                  await dataProvider.getPendingAppointmentListAssistant('', pkID);
+                                  response = dataProvider.pendingAppointmentListAssistantResponse;
                                 }
-                                // Navigator.pushNamed(context, '/listingPagescreen',
-                                //     arguments: {
-                                //       'headTitle': 'Pending Payments',
-                                //       'response': response
-                                //     })
-                                Navigator.of(context)
-                                    .push(
+                                Navigator.of(context).push(
                                   MaterialPageRoute(
                                     builder: (context) => ListingPage(
                                       headtitle: 'Pending Payments',
-                                      response: response, // full Result object
+                                      response: response,
                                       subscripPayment: null,
                                     ),
                                   ),
-                                )
-                                    .then((_) {
+                                ).then((_) {
                                   _checkSessionExpired(dataProvider);
                                 });
-                              }),
-                            ],
-                          ),
+                              },
+                            ),
+                          ],
                         ),
-                        Padding(
-                          padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                          child: Row(
-                            mainAxisAlignment: isDoctorLogin
-                                ? MainAxisAlignment.start
-                                : MainAxisAlignment.center,
-                            children: [
+                      ),
 
-                                _welcomeContainer(
-                                    '', 'Patients', 16, FontWeight.w500,
+                      // Patients & Assistant Row
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
+                        child: Row(
+                          mainAxisAlignment: isDoctorLogin
+                              ? MainAxisAlignment.start
+                              : MainAxisAlignment.center,
+                          children: [
+                            _welcomeContainer(
+                              '', 'Patients', 16, FontWeight.w500,
+                                  () async {
+                                print('Patients Tapped');
+                                if (isDoctorLogin) {
+                                  await dataProvider.getPatientListDoctor('', pkID);
+                                  response = dataProvider.patientListDoctorResponse;
+                                } else {
+                                  await dataProvider.getPatientListAssistant('', pkID);
+                                  response = dataProvider.patientListAssistantResponse;
+                                }
+                                Navigator.of(context).push(
+                                  MaterialPageRoute(
+                                    builder: (context) => ListingPage(
+                                      headtitle: 'Patients',
+                                      response: response,
+                                      subscripPayment: null,
+                                    ),
+                                  ),
+                                ).then((_) {
+                                  _checkSessionExpired(dataProvider);
+                                });
+                              },
+                            ),
+                            const SizedBox(width: 8.0),
+                            if (isDoctorLogin)
+                              _welcomeContainer(
+                                '', 'Assistant', 16, FontWeight.w500,
                                     () async {
-                                  print('Patients Tapped');
-                                  if (isDoctorLogin) {
-                                    await dataProvider.getPatientListDoctor(
-                                        '', pkID);
-                                    response =
-                                        dataProvider.patientListDoctorResponse;
-                                  } else {
-                                    await dataProvider.getPatientListAssistant(
-                                        '', pkID);
-                                    response =
-                                        dataProvider.patientListAssistantResponse;
-                                  }
-                                  // Navigator.pushNamed(
-                                  //     context, '/listingPagescreen', arguments: {
-                                  //   'headTitle': 'Patients',
-                                  //   'response': response
-                                  // })
-                                  Navigator.of(context)
-                                      .push(
+                                  print('Assistant Tapped');
+                                  await dataProvider.getAssistant('', pkID);
+                                  response = dataProvider.assistantResponse;
+                                  Navigator.of(context).push(
                                     MaterialPageRoute(
                                       builder: (context) => ListingPage(
-                                        headtitle: 'Patients',
-                                        response: response, // full Result object
+                                        headtitle: 'Assistant',
+                                        response: response,
                                         subscripPayment: null,
                                       ),
                                     ),
-                                  )
-                                      .then((_) {
+                                  ).then((_) {
                                     _checkSessionExpired(dataProvider);
                                   });
-                                }),
-                              const SizedBox(
-                                width: 8.0,
+                                },
                               ),
-                              if (isDoctorLogin)
-                              _welcomeContainer(
-                                  '', 'Assistant', 16, FontWeight.w500, () async {
-                                print('Assistant Tapped');
-                                await dataProvider.getAssistant('', pkID);
-                                response = dataProvider.assistantResponse;
-                                // Navigator.pushNamed(context, '/listingPagescreen',
-                                //     arguments: {
-                                //       'headTitle': 'Assistant',
-                                //       'response': response
-                                //     })
-                                Navigator.of(context)
-                                    .push(
-                                  MaterialPageRoute(
-                                    builder: (context) => ListingPage(
-                                      headtitle: 'Assistant',
-                                      response: response, // full Result object
-                                      subscripPayment: null,
-                                    ),
-                                  ),
-                                )
-                                    .then((_) {
-                                  _checkSessionExpired(dataProvider);
-                                });
-                              }),
-                            ],
-                          ),
+                          ],
                         ),
-                        if (isDoctorLogin)
-                          Padding(
-                            padding: const EdgeInsets.only(top: 8.0, bottom: 8.0),
-                            child: Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                _welcomeContainer(
-                                    '', 'Subscription', 16, FontWeight.w500,
+                      ),
+
+                      // Subscription (Doctor only)
+                      if (isDoctorLogin)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0, bottom: 32.0), // Extra bottom space
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              _welcomeContainer(
+                                '', 'Subscription', 16, FontWeight.w500,
                                     () async {
                                   print('Subscription Tapped');
                                   await dataProvider.getSubscriptionPayment(pkID);
-                                  final link = dataProvider
-                                          .subscriptionPaymentResponse
-                                          ?.paymentlink ??
-                                      '';
+                                  final link = dataProvider.subscriptionPaymentResponse?.paymentlink ?? '';
                                   await dataProvider.getSubscription(pkID);
                                   response = dataProvider.subscriptionResponse;
-                                  // Navigator.pushNamed(
-                                  //     context, '/listingPagescreen', arguments: {
-                                  //   'headTitle': 'Subscription',
-                                  //   'response': response,
-                                  //   'subsLink': link
-                                  // })
-                                  Navigator.of(context)
-                                      .push(
+
+                                  Navigator.of(context).push(
                                     MaterialPageRoute(
                                       builder: (context) => ListingPage(
                                         headtitle: 'Subscription',
-                                        response: response, // full Result object
+                                        response: response,
                                         subscripPayment: link,
                                       ),
                                     ),
-                                  )
-                                      .then((_) {
+                                  ).then((_) {
                                     _checkSessionExpired(dataProvider);
                                   });
-                                }),
-                              ],
-                            ),
+                                },
+                              ),
+                            ],
                           ),
-                      ],
-                    ),
+                        ),
+
+                      // Optional: Add some bottom space so user can pull down easily
+                      const SizedBox(height: 100),
+                    ],
                   ),
-                ))
-              ],
+                ),
+              ),
             );
-          })),
+          },
+        ),)
     );
   }
 

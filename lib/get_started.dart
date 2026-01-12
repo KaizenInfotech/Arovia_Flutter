@@ -35,19 +35,37 @@ class GetStarted extends StatelessWidget {
               child: Stack(
                 children: [
                   Padding(
-                    padding:  const EdgeInsets.only(bottom: 16.0,top: 16.0, left: 20.0),
+                    padding: const EdgeInsets.only(bottom: 16.0,top: 16.0,left: 10.0,right: 10.0),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text( isDoctor ? 'Effortless Appointment' : 'Seamless Scheduling and', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
-                        Text( isDoctor ? 'Management at Your Fingertips' : 'Patient Care Made Simple', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w500)),
-                        Text( isDoctor ? 'Manage schedules, track patient' : 'Designed for doctors and assistants to', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
-                        Text( isDoctor ? 'information, and streamline your' : 'simplify patient appointments and', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
-                        Text( isDoctor ? 'workflow all in one place.' : 'enhance collaboration.', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300)),
-                        const SizedBox(
-                          height: 30,
+                        Text(
+                          isDoctor
+                              ? 'Effortless Appointment\nManagement at Your Fingertips'
+                              : 'Seamless Scheduling and\nPatient Care Made Simple',
+                          style: const TextStyle(fontSize: 24, fontWeight: FontWeight.w600),
+                          textAlign: TextAlign.center,
                         ),
+                        const SizedBox(height: 20),
+                        Text(
+                          isDoctor
+                              ? 'Manage schedules, track patient information, and streamline your workflow all in one place.'
+                              : 'Designed for doctors and assistants to simplify patient appointments and enhance collaboration.',
+                          style: const TextStyle(fontSize: 18, color: Colors.grey),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 40),
+
+                      // crossAxisAlignment: CrossAxisAlignment.center,
+                      // mainAxisAlignment: MainAxisAlignment.center,
+                      // children: [
+                      //   Text( isDoctor ? 'Effortless Appointment' : 'Seamless Scheduling and', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w500),textAlign: TextAlign.center),
+                      //   Text( isDoctor ? 'Management at Your Fingertips' : 'Patient Care Made Simple', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.w500),textAlign: TextAlign.center),
+                      //   Text( isDoctor ? 'Manage schedules, track patient' : 'Designed for doctors and assistants to', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300),textAlign: TextAlign.center),
+                      //   Text( isDoctor ? 'information, and streamline your' : 'simplify patient appointments and', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300),textAlign: TextAlign.center),
+                      //   Text( isDoctor ? 'workflow all in one place.' : 'enhance collaboration.', style: const TextStyle(fontSize: 20, fontWeight: FontWeight.w300),textAlign: TextAlign.center),
+                      //   const SizedBox(
+                      //     height: 30,
+                      //   ),
                         SizedBox(
                           height: 50,
                           width: MediaQuery.of(context).size.width - 50,
