@@ -1146,7 +1146,7 @@ class _ListingPageState extends State<ListingPage> {
                                                                   'status':
                                                                       status
                                                                 });
-                                                         if (result == true && mounted) {
+                                                         if (result == true && mounted &&  widget.headtitle == "Assistant") {
                                                            final dataProvider = Provider.of<DataProvider>(context, listen: false);
 
                                                            // Refresh original data depending on login type
