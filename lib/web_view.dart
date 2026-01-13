@@ -1,123 +1,99 @@
-// import 'package:flutter/material.dart';
-// import 'package:flutter_inappwebview/flutter_inappwebview.dart';
-// import 'package:provider/provider.dart';
-// import 'package:shared_preferences/shared_preferences.dart';
-//
-// import 'data_provider.dart';
-//
-// class WebViewContainer extends StatefulWidget {
-//   const WebViewContainer({
-//     super.key,
-//     required this.selectedUrl,
-//     required this.webTitle,
-//   });
-//
-//   final String selectedUrl;
-//   final String webTitle;
-//
-//   @override
-//   State<WebViewContainer> createState() => _SimpleWebViewState();
-// }
-//
-// // class _SimpleWebViewState extends State<WebViewContainer> {
-// //   InAppWebViewController? _webViewController;
-// //
-// //    @override
-// //   Widget build(BuildContext context) { final dataProvider = Provider.of<DataProvider>(context);
-// //
-// //    if (widget.selectedUrl == "" || widget.selectedUrl.trim().isEmpty) {
-// //      return Scaffold(
-// //        appBar: AppBar(
-// //          title: Text(widget.webTitle),
-// //          leading: IconButton(
-// //            icon: const Icon(Icons.arrow_back),
-// //            onPressed: () => Navigator.pop(context),
-// //          ),
-// //        ),
-// //        body: const Center(
-// //          child: Column(
-// //            mainAxisAlignment: MainAxisAlignment.center,
-// //            children: [
-// //              Icon(Icons.link_off, size: 64, color: Colors.grey),
-// //              SizedBox(height: 16),
-// //              Text(
-// //                'Invalid or Missing URL',
-// //                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-// //              ),
-// //              SizedBox(height: 8),
-// //              Text(
-// //                'No valid link was provided to open.',
-// //                style: TextStyle(color: Colors.grey),
-// //                textAlign: TextAlign.center,
-// //              ),
-// //            ],
-// //          ),
-// //        ),
-// //      );
-// //    }
-// //
-// //     return PopScope(
-// //       canPop: false,
-// //       onPopInvokedWithResult: (didPop, result) async {
-// //         if (didPop) return;
-// //         Navigator.pop(context, true);
-// //       },
-// //       child: Scaffold(
-// //         appBar: AppBar(
-// //           title: Text(widget.webTitle),
-// //           leading: IconButton(onPressed: ()async{
-// //              Navigator.pop(context,true);
-// //           }, icon: Icon(Icons.arrow_back)),
-// //         ),
-// //         body: Column(
-// //          children: [
-// //           Expanded(
-// //              child: InAppWebView(
-// //             initialUrlRequest: URLRequest(url: WebUri(widget.selectedUrl)),
-// //             initialSettings: InAppWebViewSettings(
-// //               javaScriptEnabled: true,
-// //               mediaPlaybackRequiresUserGesture: false,
-// //               allowsInlineMediaPlayback: true,
-// //               // Add these iOS-specific settings
-// //               allowsBackForwardNavigationGestures: false,
-// //               disableHorizontalScroll: false,
-// //               disableVerticalScroll: false,
-// //               suppressesIncrementalRendering: true,
-// //               allowsLinkPreview: false,
-// //               ignoresViewportScaleLimits: false,
-// //               applePayAPIEnabled: false,
-// //
-// //             ),
-// //             onWebViewCreated: (controller) {
-// //               _webViewController = controller;
-// //             },
-// //                onLoadStop: (controller, url) async {
-// //                  // Inject JavaScript to fix iOS touch issues
-// //                  await controller.evaluateJavascript(source: """
-// //       (function() {
-// //         // Prevent iOS ghost clicks
-// //         document.addEventListener('touchend', function(e) {
-// //           e.stopImmediatePropagation();
-// //         }, true);
-// //
-// //         // Add touch-action CSS to buttons
-// //         var buttons = document.querySelectorAll('button, input[type="submit"], input[type="button"]');
-// //         buttons.forEach(function(btn) {
-// //           btn.style.touchAction = 'manipulation';
-// //           btn.style.webkitTouchCallout = 'none';
-// //         });
-// //       })();
-// //     """);
-// //                },
-// //           ),
-// //           )
-// //          ],
-// //         )
-// //       ),
-// //     );
-// //   }
-// // }
-//
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:flutter_inappwebview/flutter_inappwebview.dart';
+import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
+import 'data_provider.dart';
+
+class WebViewContainer extends StatefulWidget {
+  const WebViewContainer({
+    super.key,
+    required this.selectedUrl,
+    required this.webTitle,
+  });
+
+  final String selectedUrl;
+  final String webTitle;
+
+  @override
+  State<WebViewContainer> createState() => _SimpleWebViewState();
+}
+
+class _SimpleWebViewState extends State<WebViewContainer> {
+  InAppWebViewController? _webViewController;
+
+   @override
+  Widget build(BuildContext context) { final dataProvider = Provider.of<DataProvider>(context);
+
+   if (widget.selectedUrl == "" || widget.selectedUrl.trim().isEmpty) {
+     return Scaffold(
+       appBar: AppBar(
+         title: Text(widget.webTitle),
+         leading: IconButton(
+           icon: const Icon(Icons.arrow_back),
+           onPressed: () => Navigator.pop(context),
+         ),
+       ),
+       body: const Center(
+         child: Column(
+           mainAxisAlignment: MainAxisAlignment.center,
+           children: [
+             Icon(Icons.link_off, size: 64, color: Colors.grey),
+             SizedBox(height: 16),
+             Text(
+               'Invalid or Missing URL',
+               style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+             ),
+             SizedBox(height: 8),
+             Text(
+               'No valid link was provided to open.',
+               style: TextStyle(color: Colors.grey),
+               textAlign: TextAlign.center,
+             ),
+           ],
+         ),
+       ),
+     );
+   }
+
+    return PopScope(
+      canPop: false,
+      onPopInvokedWithResult: (didPop, result) async {
+        if (didPop) return;
+        Navigator.pop(context, true);
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(widget.webTitle),
+          leading: IconButton(onPressed: ()async{
+             Navigator.pop(context,true);
+          }, icon: Icon(Icons.arrow_back)),
+        ),
+        body: Column(
+         children: [
+          Expanded(
+             child: InAppWebView(
+            initialUrlRequest: URLRequest(url: WebUri(widget.selectedUrl)),
+               initialSettings: InAppWebViewSettings(
+                 javaScriptEnabled: true,
+                 mediaPlaybackRequiresUserGesture: false,
+                 allowsInlineMediaPlayback: true,
+               ),
+
+               onWebViewCreated: (controller) {
+              _webViewController = controller;
+            },
+          ),
+          )
+         ],
+        )
+      ),
+    );
+  }
+}
+
 // class _SimpleWebViewState extends State<WebViewContainer> {
 //   InAppWebViewController? _webViewController;
 //
@@ -440,189 +416,189 @@
 // }
 
 ///
-import 'dart:convert';
-import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-
-// Android
-import 'package:webview_flutter_android/webview_flutter_android.dart';
-
-// iOS
-import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
-
-import 'data_provider.dart';
-
-class WebViewContainer extends StatefulWidget {
-  const WebViewContainer({
-    super.key,
-    required this.selectedUrl,
-    required this.webTitle,
-  });
-
-  final String selectedUrl;
-  final String webTitle;
-
-  @override
-  State<WebViewContainer> createState() => _WebViewContainerState();
-}
-
-class _WebViewContainerState extends State<WebViewContainer> {
-  late final WebViewController _controller;
-
-  @override
-  void initState() {
-    super.initState();
-
-    // ───────────────── Platform creation params ─────────────────
-    late final PlatformWebViewControllerCreationParams params;
-
-    if (WebViewPlatform.instance is WebKitWebViewPlatform) {
-      params = WebKitWebViewControllerCreationParams(
-        allowsInlineMediaPlayback: true,
-        mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
-      );
-    }
-    else {
-      // Android
-      params = const PlatformWebViewControllerCreationParams();
-    }
-
-    _controller = WebViewController.fromPlatformCreationParams(params)
-      ..setJavaScriptMode(JavaScriptMode.unrestricted)
-      ..setBackgroundColor(Colors.transparent)
-      ..setNavigationDelegate(
-        NavigationDelegate(
-          onProgress: (progress) {
-            debugPrint('Loading: $progress%');
-          },
-          onPageStarted: (url) {
-            debugPrint('Started: $url');
-          },
-          onPageFinished: (url) async {
-            debugPrint('Finished: $url');
-
-            // ───────────── iOS Ghost Click Fix ─────────────
-            await _controller.runJavaScript('''
-(function () {
-  if (window.__ghostFixApplied) return;
-  window.__ghostFixApplied = true;
-
-  const style = document.createElement('style');
-  style.innerHTML = `
-    * {
-      touch-action: manipulation !important;
-      -webkit-touch-callout: none !important;
-      -webkit-user-select: none !important;
-      -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
-    }
-
-    a, button, input, textarea, select {
-      touch-action: manipulation !important;
-    }
-  `;
-  document.head.appendChild(style);
-
-  document.addEventListener('touchend', function (e) {
-    const el = e.target.closest('a, button');
-    if (el) el.click();
-  }, { passive: true });
-
-})();
-''');
-
-          },
-          onWebResourceError: (error) {
-            debugPrint('Web error: ${error.description}');
-          },
-        ),
-      );
-
-    // ───────────────── Android extras ─────────────────
-    if (_controller.platform is AndroidWebViewController) {
-      AndroidWebViewController.enableDebugging(true);
-      (_controller.platform as AndroidWebViewController)
-          .setMediaPlaybackRequiresUserGesture(false);
-    }
-
-    // ───────────────── iOS extras ─────────────────
-    if (_controller.platform is WebKitWebViewController) {
-      // (_controller.platform as WebKitWebViewController)
-      //     .setScrollBounceEnabled(false); // reduces ghost taps
-    }
-
-    // Load URL
-    if (widget.selectedUrl.trim().isNotEmpty) {
-      _controller.loadRequest(Uri.parse(widget.selectedUrl));
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final dataProvider = Provider.of<DataProvider>(context);
-
-    if (widget.selectedUrl.trim().isEmpty) {
-      return Scaffold(
-        appBar: AppBar(
-          title: Text(widget.webTitle),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context),
-          ),
-        ),
-        body: const Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Icon(Icons.link_off, size: 64, color: Colors.grey),
-              SizedBox(height: 16),
-              Text(
-                'Invalid or Missing URL',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 8),
-              Text(
-                'No valid link was provided to open.',
-                style: TextStyle(color: Colors.grey),
-                textAlign: TextAlign.center,
-              ),
-            ],
-          ),
-        ),
-      );
-    }
-
-    return PopScope(
-      canPop: false,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (didPop) return;
-
-        if (await _controller.canGoBack()) {
-          await _controller.goBack();
-        } else {
-          if (context.mounted) {
-            Navigator.pop(context, true);
-          }
-        }
-      },
-      child: Scaffold(
-        appBar: AppBar(
-          title: Text(widget.webTitle),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () async {
-              if (await _controller.canGoBack()) {
-                await _controller.goBack();
-              } else {
-                if (context.mounted) {
-                  Navigator.pop(context, true);
-                }
-              }
-            },
-          ),
-        ),
-        body: WebViewWidget(controller: _controller),
-      ),
-    );
-  }
-}
+// import 'dart:convert';
+// import 'package:flutter/material.dart';
+// import 'package:provider/provider.dart';
+// import 'package:webview_flutter/webview_flutter.dart';
+//
+// // Android
+// import 'package:webview_flutter_android/webview_flutter_android.dart';
+//
+// // iOS
+// import 'package:webview_flutter_wkwebview/webview_flutter_wkwebview.dart';
+//
+// import 'data_provider.dart';
+//
+// class WebViewContainer extends StatefulWidget {
+//   const WebViewContainer({
+//     super.key,
+//     required this.selectedUrl,
+//     required this.webTitle,
+//   });
+//
+//   final String selectedUrl;
+//   final String webTitle;
+//
+//   @override
+//   State<WebViewContainer> createState() => _WebViewContainerState();
+// }
+//
+// class _WebViewContainerState extends State<WebViewContainer> {
+//   late final WebViewController _controller;
+//
+//   @override
+//   void initState() {
+//     super.initState();
+//
+//     // ───────────────── Platform creation params ─────────────────
+//     late final PlatformWebViewControllerCreationParams params;
+//
+//     if (WebViewPlatform.instance is WebKitWebViewPlatform) {
+//       params = WebKitWebViewControllerCreationParams(
+//         allowsInlineMediaPlayback: true,
+//         mediaTypesRequiringUserAction: const <PlaybackMediaTypes>{},
+//       );
+//     }
+//     else {
+//       // Android
+//       params = const PlatformWebViewControllerCreationParams();
+//     }
+//
+//     _controller = WebViewController.fromPlatformCreationParams(params)
+//       ..setJavaScriptMode(JavaScriptMode.unrestricted)
+//       ..setBackgroundColor(Colors.transparent)
+//       ..setNavigationDelegate(
+//         NavigationDelegate(
+//           onProgress: (progress) {
+//             debugPrint('Loading: $progress%');
+//           },
+//           onPageStarted: (url) {
+//             debugPrint('Started: $url');
+//           },
+//           onPageFinished: (url) async {
+//             debugPrint('Finished: $url');
+//
+//             // ───────────── iOS Ghost Click Fix ─────────────
+//             await _controller.runJavaScript('''
+// (function () {
+//   if (window.__ghostFixApplied) return;
+//   window.__ghostFixApplied = true;
+//
+//   const style = document.createElement('style');
+//   style.innerHTML = `
+//     * {
+//       touch-action: manipulation !important;
+//       -webkit-touch-callout: none !important;
+//       -webkit-user-select: none !important;
+//       -webkit-tap-highlight-color: rgba(0,0,0,0) !important;
+//     }
+//
+//     a, button, input, textarea, select {
+//       touch-action: manipulation !important;
+//     }
+//   `;
+//   document.head.appendChild(style);
+//
+//   document.addEventListener('touchend', function (e) {
+//     const el = e.target.closest('a, button');
+//     if (el) el.click();
+//   }, { passive: true });
+//
+// })();
+// ''');
+//
+//           },
+//           onWebResourceError: (error) {
+//             debugPrint('Web error: ${error.description}');
+//           },
+//         ),
+//       );
+//
+//     // ───────────────── Android extras ─────────────────
+//     if (_controller.platform is AndroidWebViewController) {
+//       AndroidWebViewController.enableDebugging(true);
+//       (_controller.platform as AndroidWebViewController)
+//           .setMediaPlaybackRequiresUserGesture(false);
+//     }
+//
+//     // ───────────────── iOS extras ─────────────────
+//     if (_controller.platform is WebKitWebViewController) {
+//       // (_controller.platform as WebKitWebViewController)
+//       //     .setScrollBounceEnabled(false); // reduces ghost taps
+//     }
+//
+//     // Load URL
+//     if (widget.selectedUrl.trim().isNotEmpty) {
+//       _controller.loadRequest(Uri.parse(widget.selectedUrl));
+//     }
+//   }
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     final dataProvider = Provider.of<DataProvider>(context);
+//
+//     if (widget.selectedUrl.trim().isEmpty) {
+//       return Scaffold(
+//         appBar: AppBar(
+//           title: Text(widget.webTitle),
+//           leading: IconButton(
+//             icon: const Icon(Icons.arrow_back),
+//             onPressed: () => Navigator.pop(context),
+//           ),
+//         ),
+//         body: const Center(
+//           child: Column(
+//             mainAxisAlignment: MainAxisAlignment.center,
+//             children: [
+//               Icon(Icons.link_off, size: 64, color: Colors.grey),
+//               SizedBox(height: 16),
+//               Text(
+//                 'Invalid or Missing URL',
+//                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+//               ),
+//               SizedBox(height: 8),
+//               Text(
+//                 'No valid link was provided to open.',
+//                 style: TextStyle(color: Colors.grey),
+//                 textAlign: TextAlign.center,
+//               ),
+//             ],
+//           ),
+//         ),
+//       );
+//     }
+//
+//     return PopScope(
+//       canPop: false,
+//       onPopInvokedWithResult: (didPop, result) async {
+//         if (didPop) return;
+//
+//         if (await _controller.canGoBack()) {
+//           await _controller.goBack();
+//         } else {
+//           if (context.mounted) {
+//             Navigator.pop(context, true);
+//           }
+//         }
+//       },
+//       child: Scaffold(
+//         appBar: AppBar(
+//           title: Text(widget.webTitle),
+//           leading: IconButton(
+//             icon: const Icon(Icons.arrow_back),
+//             onPressed: () async {
+//               if (await _controller.canGoBack()) {
+//                 await _controller.goBack();
+//               } else {
+//                 if (context.mounted) {
+//                   Navigator.pop(context, true);
+//                 }
+//               }
+//             },
+//           ),
+//         ),
+//         body: WebViewWidget(controller: _controller),
+//       ),
+//     );
+//   }
+// }

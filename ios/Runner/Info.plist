@@ -32,6 +32,23 @@
 	<string>Allow access to the camera to take photos and videos.</string>
 	<key>NSMicrophoneUsageDescription</key>
 	<string>Allow access to the microphone to record audio.</string>
+	<key>NSCameraUsageDescription</key>
+    <string>Allow camera access for file upload</string>
+
+    <key>NSPhotoLibraryUsageDescription</key>
+    <string>Allow photo access for file upload</string>
+
+    <key>NSMicrophoneUsageDescription</key>
+    <string>Allow microphone access</string>
+
+    <key>NSAppTransportSecurity</key>
+    <dict>
+      <key>NSAllowsArbitraryLoads</key>
+      <true/>
+      <key>NSAllowsArbitraryLoadsInWebContent</key>
+      <true/>
+    </dict>
+
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
