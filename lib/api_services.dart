@@ -1016,4 +1016,42 @@ static Future<ForceUpdate> fetchForceUpdate(String appName) async {
   }
    }
 
+   static Future<Result> WhatsAppAPI(
+  int pkId, 
+  ) async {
+
+  final url = Uri.parse("$baseUrl/Patients/Send_Whatsupr");
+
+  Map<String, dynamic> requestBody = {
+  "pk_Patient_id": pkId
+};
+
+try {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('auth_token');
+
+    final response = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        if (token != null) 'Authorization': 'Bearer $token',
+        },
+      body: jsonEncode(requestBody),
+    );
+    if (response.statusCode == 200) {
+      if (kDebugMode) {
+        print('WhatsApp API SUCCESSFUL-----------------------------------------');
+      }
+      return Result.fromJson(jsonDecode(response.body));
+    } else {
+      throw Exception("Failed to login");
+    }
+  } catch (e) {
+    if (kDebugMode) {
+      print("Error: $e");
+    }
+    throw Exception("Failed to login");
+  }
+}
+
 }

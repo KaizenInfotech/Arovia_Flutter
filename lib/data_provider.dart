@@ -165,6 +165,12 @@ class DataProvider with ChangeNotifier {
   Weblink? get weblinkResponse => _weblinkResponse;
   bool get weblinkLoading => _weblinkLoading;
 
+  //WhatsApp API
+  Result? _whatsAppResponse;
+  bool _whatsAppLoading = false;
+  Result? get whatsAppResponse => _whatsAppResponse;
+  bool get whatsAppLoading => _whatsAppLoading;
+
   void dataProviderFunction(bool isDoc) {
     _isDoctor = isDoc;
     notifyListeners();
@@ -650,6 +656,24 @@ class DataProvider with ChangeNotifier {
       _logineError = e.toString();
     }
     notifyListeners();
+  }
+
+  
+  Future<void> getwhatsApp(
+      int pkID
+      ) async {
+    _whatsAppLoading = true;
+    _authError = '';
+    notifyListeners();
+    try {
+      _whatsAppResponse = await ApiService.WhatsAppAPI(pkID);
+      _whatsAppLoading = false;
+    } catch (e) {
+      _authError = e.toString();
+    } finally {
+      _whatsAppLoading = false;
+      notifyListeners();
+    }
   }
 }
 

@@ -156,11 +156,13 @@ class _PatientDetailPageState extends State<PatientDetailPage> {
                 ),
                 const SizedBox(height: 10),
                 Center(
-                  child: _patientPage('Reminder', () {
+                  child: _patientPage('Reminder', () async {
                     print('Reminder Tapped');
                     var amntPend = widget.amtPending ?? '';
                     if (amntPend != 'Rs. 0') {
-                      openDialog();
+                     await dataProvider.getwhatsApp(pkid ?? 0);
+                     ScaffoldMessenger.of(context).showSnackBar(
+                           SnackBar(content: Text( dataProvider.whatsAppResponse?.message ?? "")));
                     } else {
                       ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(content: Text("No Pending Amount")));
