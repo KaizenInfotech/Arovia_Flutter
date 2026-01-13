@@ -161,7 +161,7 @@ class _PatientDetailPageState extends State<PatientDetailPage> {
                     print('Reminder Tapped');
                     var amntPend = widget.amtPending ?? '';
                     if (amntPend != 'Rs. 0') {
-                     await dataProvider.getwhatsApp(pkid ?? 0);
+                     await dataProvider.getwhatsApp(widget.patientID ?? 0);
                      ScaffoldMessenger.of(context).showSnackBar(
                            SnackBar(content: Text( dataProvider.whatsAppResponse?.message ?? "")));
                     } else {
