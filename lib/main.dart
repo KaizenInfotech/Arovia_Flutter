@@ -82,7 +82,7 @@ class MainApp extends StatelessWidget {
       },
       builder: (context, child) {
         return PopScope(
-          canPop: !Platform.isIOS,
+          canPop: Platform.isIOS,
           child: child ?? const SizedBox.shrink(),
         );
       },
