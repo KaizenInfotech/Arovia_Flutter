@@ -523,7 +523,6 @@ class _WebViewContainerState extends State<WebViewContainer> {
   `;
   document.head.appendChild(style);
 
-  // Force click dispatch on iOS
   document.addEventListener('touchend', function (e) {
     const el = e.target.closest('a, button');
     if (el) el.click();
@@ -531,6 +530,7 @@ class _WebViewContainerState extends State<WebViewContainer> {
 
 })();
 ''');
+
           },
           onWebResourceError: (error) {
             debugPrint('Web error: ${error.description}');
