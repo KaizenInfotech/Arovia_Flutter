@@ -1020,11 +1020,13 @@ static Future<ForceUpdate> fetchForceUpdate(String appName) async {
   int pkId, 
   ) async {
 
-  final url = Uri.parse("$baseUrl/Patients/Send_Whatsupr");
+  final url = Uri.parse("$baseUrl/Patients/Send_Whatsup");
 
   Map<String, dynamic> requestBody = {
   "pk_Patient_id": pkId
 };
+
+  print("url :: $url || requestBody :: $requestBody");
 
 try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -1038,6 +1040,7 @@ try {
         },
       body: jsonEncode(requestBody),
     );
+    print("WhatsAppAPI response :: ${response.body}");
     if (response.statusCode == 200) {
       if (kDebugMode) {
         print('WhatsApp API SUCCESSFUL-----------------------------------------');

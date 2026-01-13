@@ -38,6 +38,7 @@ class _PatientDetailPageState extends State<PatientDetailPage> {
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       final prefs = await SharedPreferences.getInstance();
       pkid = prefs.getInt('pkID');
+      print("pkid ::::::::::: $pkid");
     });
   }
 
