@@ -80,6 +80,12 @@ class MainApp extends StatelessWidget {
         '/welcome': (context) => const WelcomeScreen(),
         '/dashboardscreen': (context) => const DashBoard(),
       },
+      builder: (context, child) {
+        return PopScope(
+          canPop: !Platform.isIOS,
+          child: child ?? const SizedBox.shrink(),
+        );
+      },
       onGenerateRoute: (settings) {
         final args = settings.arguments as Map<String, dynamic>?;
         print(
