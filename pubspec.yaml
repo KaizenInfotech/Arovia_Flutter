@@ -26,6 +26,9 @@ dependencies:
   flutter_inappwebview: ^6.1.5
   package_info_plus: ^8.3.0
   cached_network_image: ^3.4.1
+  webview_flutter: ^4.13.1
+  webview_flutter_android: ^4.10.11
+  webview_flutter_wkwebview: ^3.23.5
 
 dev_dependencies:
   flutter_test:

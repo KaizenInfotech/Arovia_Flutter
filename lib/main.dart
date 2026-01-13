@@ -182,80 +182,205 @@ class MainApp extends StatelessWidget {
   }
 }
 
-class WelcomeScreen extends StatelessWidget {
+// class WelcomeScreen extends StatelessWidget {
+//   const WelcomeScreen({super.key});
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Consumer<DataProvider>(builder: (context, dataProvider, child) {
+//       return Scaffold(
+//         backgroundColor: const Color.fromRGBO(251, 246, 227, 1),
+//
+//         body: dataProvider.loading
+//             ? const Center(
+//                 child: CircularProgressIndicator(),
+//               )
+//             : Padding(
+//                 padding: const EdgeInsets.all(50.0),
+//                 child: Column(
+//                   crossAxisAlignment: CrossAxisAlignment.center,
+//                   mainAxisAlignment: MainAxisAlignment.center,
+//                   children: [
+//                     SizedBox(
+//                       // width: 300,
+//                       // height: 300,
+//                       child: Image.asset(
+//                         'assets/arovia_logo.png',
+//                         fit: BoxFit.contain,
+//                       ),
+//                     ),
+//                     _textFunction('Welcome Back!', 24, FontWeight.w500),
+//                     _textFunction('Use Credentials to access your account', 15,
+//                         FontWeight.w300),
+//                     const SizedBox(
+//                       height: 40,
+//                     ),
+//                     _welcomeContainer('assets/doctor.png', 'I’m a Doctor',
+//                         () async {
+//                       debugPrint('Doctor Tapped');
+//                       dataProvider.dataProviderFunction(true);
+//                       await dataProvider.getAuthToken();
+//                       final SharedPreferences prefs =
+//                           await SharedPreferences.getInstance();
+//                       await prefs.setString(
+//                           'auth_token', dataProvider.authToken?.token ?? '');
+//                       await prefs.setBool(
+//                           'isDoctorLogin', dataProvider.isDoctor ?? false);
+//                       Navigator.pushNamed(
+//                         context,
+//                         '/getStart',
+//                         arguments: {'username': 'Doctor'},
+//                       );
+//                       print('AUTHTOKEN-------${dataProvider.authToken?.token}');
+//                     }),
+//                     const SizedBox(
+//                       height: 40,
+//                     ),
+//                     _welcomeContainer('assets/nurse.png', 'I’m an Assistant',
+//                         () async {
+//                       print('Nurse Tapped');
+//                       dataProvider.dataProviderFunction(false);
+//                       await dataProvider.getAuthToken();
+//                       final SharedPreferences prefs =
+//                           await SharedPreferences.getInstance();
+//                       await prefs.setString(
+//                           'auth_token', dataProvider.authToken?.token ?? '');
+//                       await prefs.setBool(
+//                           'isDoctorLogin', dataProvider.isDoctor ?? false);
+//                       Navigator.pushNamed(
+//                         context,
+//                         '/getStart',
+//                         arguments: {'username': 'Assistant'},
+//                       );
+//                       print('AUTHTOKEN-------${dataProvider.authToken?.token}');
+//                     }),
+//                   ],
+//                 ),
+//               ),
+//       );
+//     });
+//   }
+//
+//   Widget _textFunction(String title, double fontSize, FontWeight fontDesign) {
+//     return Text(
+//       title,
+//       textAlign: TextAlign.center,
+//       style: TextStyle(fontSize: fontSize, fontWeight: fontDesign),
+//     );
+//   }
+//
+//   Widget _welcomeContainer(String img, String heading, VoidCallback onTap) {
+//     return InkWell(
+//       onTap: onTap,
+//       child: Container(
+//         decoration:
+//             const BoxDecoration(color: Color.fromRGBO(255, 255, 255, 1)),
+//         child: Padding(
+//           padding: const EdgeInsets.all(16.0),
+//           child: Row(
+//             mainAxisAlignment: MainAxisAlignment.start,
+//             children: [
+//               Image.asset(img, fit: BoxFit.fill),
+//               const SizedBox(
+//                 width: 20,
+//               ),
+//               _textFunction(heading, 14, FontWeight.w600)
+//             ],
+//           ),
+//         ),
+//       ),
+//     );
+//   }
+// }
+
+class WelcomeScreen extends StatefulWidget {
   const WelcomeScreen({super.key});
 
+  @override
+  State<WelcomeScreen> createState() => _WelcomeScreenState();
+}
+
+class _WelcomeScreenState extends State<WelcomeScreen> {
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      FocusScope.of(context).unfocus();
+    });
+  }
   @override
   Widget build(BuildContext context) {
     return Consumer<DataProvider>(builder: (context, dataProvider, child) {
       return Scaffold(
         backgroundColor: const Color.fromRGBO(251, 246, 227, 1),
+
         body: dataProvider.loading
             ? const Center(
-                child: CircularProgressIndicator(),
-              )
+          child: CircularProgressIndicator(),
+        )
             : Padding(
-                padding: const EdgeInsets.all(50.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    SizedBox(
-                      // width: 300,
-                      // height: 300,
-                      child: Image.asset(
-                        'assets/arovia_logo.png',
-                        fit: BoxFit.contain,
-                      ),
-                    ),
-                    _textFunction('Welcome Back!', 24, FontWeight.w500),
-                    _textFunction('Use Credentials to access your account', 15,
-                        FontWeight.w300),
-                    const SizedBox(
-                      height: 40,
-                    ),
-                    _welcomeContainer('assets/doctor.png', 'I’m a Doctor',
-                        () async {
-                      debugPrint('Doctor Tapped');
-                      dataProvider.dataProviderFunction(true);
-                      await dataProvider.getAuthToken();
-                      final SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      await prefs.setString(
-                          'auth_token', dataProvider.authToken?.token ?? '');
-                      await prefs.setBool(
-                          'isDoctorLogin', dataProvider.isDoctor ?? false);
-                      Navigator.pushNamed(
-                        context,
-                        '/getStart',
-                        arguments: {'username': 'Doctor'},
-                      );
-                      print('AUTHTOKEN-------${dataProvider.authToken?.token}');
-                    }),
-                    const SizedBox(
-                      height: 40,
-                    ),
-                    _welcomeContainer('assets/nurse.png', 'I’m an Assistant',
-                        () async {
-                      print('Nurse Tapped');
-                      dataProvider.dataProviderFunction(false);
-                      await dataProvider.getAuthToken();
-                      final SharedPreferences prefs =
-                          await SharedPreferences.getInstance();
-                      await prefs.setString(
-                          'auth_token', dataProvider.authToken?.token ?? '');
-                      await prefs.setBool(
-                          'isDoctorLogin', dataProvider.isDoctor ?? false);
-                      Navigator.pushNamed(
-                        context,
-                        '/getStart',
-                        arguments: {'username': 'Assistant'},
-                      );
-                      print('AUTHTOKEN-------${dataProvider.authToken?.token}');
-                    }),
-                  ],
+          padding: const EdgeInsets.all(50.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              SizedBox(
+                // width: 300,
+                // height: 300,
+                child: Image.asset(
+                  'assets/arovia_logo.png',
+                  fit: BoxFit.contain,
                 ),
               ),
+              _textFunction('Welcome Back!', 24, FontWeight.w500),
+              _textFunction('Use Credentials to access your account', 15,
+                  FontWeight.w300),
+              const SizedBox(
+                height: 40,
+              ),
+              _welcomeContainer('assets/doctor.png', 'I’m a Doctor',
+                      () async {
+                    debugPrint('Doctor Tapped');
+                    dataProvider.dataProviderFunction(true);
+                    await dataProvider.getAuthToken();
+                    final SharedPreferences prefs =
+                    await SharedPreferences.getInstance();
+                    await prefs.setString(
+                        'auth_token', dataProvider.authToken?.token ?? '');
+                    await prefs.setBool(
+                        'isDoctorLogin', dataProvider.isDoctor ?? false);
+                    Navigator.pushNamed(
+                      context,
+                      '/getStart',
+                      arguments: {'username': 'Doctor'},
+                    );
+                    print('AUTHTOKEN-------${dataProvider.authToken?.token}');
+                  }),
+              const SizedBox(
+                height: 40,
+              ),
+              _welcomeContainer('assets/nurse.png', 'I’m an Assistant',
+                      () async {
+                    print('Nurse Tapped');
+                    dataProvider.dataProviderFunction(false);
+                    await dataProvider.getAuthToken();
+                    final SharedPreferences prefs =
+                    await SharedPreferences.getInstance();
+                    await prefs.setString(
+                        'auth_token', dataProvider.authToken?.token ?? '');
+                    await prefs.setBool(
+                        'isDoctorLogin', dataProvider.isDoctor ?? false);
+                    Navigator.pushNamed(
+                      context,
+                      '/getStart',
+                      arguments: {'username': 'Assistant'},
+                    );
+                    print('AUTHTOKEN-------${dataProvider.authToken?.token}');
+                  }),
+            ],
+          ),
+        ),
       );
     });
   }
@@ -273,7 +398,7 @@ class WelcomeScreen extends StatelessWidget {
       onTap: onTap,
       child: Container(
         decoration:
-            const BoxDecoration(color: Color.fromRGBO(255, 255, 255, 1)),
+        const BoxDecoration(color: Color.fromRGBO(255, 255, 255, 1)),
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Row(
