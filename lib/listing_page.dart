@@ -1285,30 +1285,30 @@ class _ListingPageState extends State<ListingPage> {
                                 fontWeight: FontWeight.bold,
                                 color: Color.fromRGBO(250, 166, 28, 1)),
                           ),
-                          Spacer(),
-                          if (isIconHide)
-                          InkWell(
-                            onTap: () {
-                              _launchURL(subsPayData);
-                            },
-                            child: Container(
-                              width: 160,
-                              decoration: BoxDecoration(
-                                color: const Color.fromRGBO(250, 166, 28, 1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Padding(
-                                padding: EdgeInsets.all(10.0),
-                                child: Center(
-                                  child: Text('Pay',
-                                      style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors.white)),
-                                ),
-                              ),
-                            ),
-                          )
+                          // Spacer(),
+                          // if (isIconHide)
+                          // InkWell(
+                          //   onTap: () {
+                          //     _launchURL(subsPayData);
+                          //   },
+                          //   child: Container(
+                          //     width: 160,
+                          //     decoration: BoxDecoration(
+                          //       color: const Color.fromRGBO(250, 166, 28, 1),
+                          //       borderRadius: BorderRadius.circular(8),
+                          //     ),
+                          //     child: const Padding(
+                          //       padding: EdgeInsets.all(10.0),
+                          //       child: Center(
+                          //         child: Text('Pay',
+                          //             style: TextStyle(
+                          //                 fontSize: 18,
+                          //                 fontWeight: FontWeight.w600,
+                          //                 color: Colors.white)),
+                          //       ),
+                          //     ),
+                          //   ),
+                          // )
                       ],
                     )
                     // isIconHide

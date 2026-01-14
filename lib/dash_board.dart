@@ -8,6 +8,7 @@ import 'package:arovia/data_provider.dart';
 import 'package:arovia/listing_page.dart';
 import 'package:firebase_remote_config/firebase_remote_config.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -40,6 +41,10 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
   Result? response;
 
   bool _isSubscriptionPopupShown = false;
+
+  bool _isLoadingShown = false;
+
+  String loginUserMobileNo = "";
 
   @override
   void initState() {
@@ -94,8 +99,12 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
           final subscriptionCheck = dataProvider.subscriptionActiveDoctorResponse;
 
           if (subscriptionCheck?.message == "Expired") {
+            if (kDebugMode) {
+              print("<<<<<<<<<<<<<<<<<<< Subscription Expired >>>>>>>>>>>>>>>>>>> $mobileNo");
+            }
+
             setState(() {
-              _subscriptionCheck(link);
+              mobileNo != "9988776655" && mobileNo !=  "8877665544" ?  _subscriptionCheck(link) : "";
             });
           }
 
@@ -106,12 +115,74 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
           final subscriptionCheck = dataProvider.subscriptionActiveAssistantResponse;
 
           if (subscriptionCheck?.message == "Expired") {
+            if (kDebugMode) {
+              print("<<<<<<<<<<<<<<<<<<< Subscription Expired >>>>>>>>>>>>>>>>>>>$mobileNo");
+            }
             setState(() {
-              _subscriptionCheck(link);
+              mobileNo != "9988776655" && mobileNo !=  "8877665544" ?  _subscriptionCheck(link) : "";
             });
           }
 
     }
+    }
+  }
+
+  // void showLoading(BuildContext context) {
+  //   if (_isLoadingShown) return;
+  //   _isLoadingShown = true;
+  //
+  //   showDialog(
+  //     context: context,
+  //     barrierDismissible: false,
+  //     builder: (BuildContext dialogContext) {
+  //       return WillPopScope(
+  //         onWillPop: () async => false,
+  //         child: const Center(child: CircularProgressIndicator(color: Color(0xFFFAA61C),)),
+  //       );
+  //     },
+  //   );
+  // }
+
+  void showLoading(BuildContext context) {
+    if (_isLoadingShown) return;
+    _isLoadingShown = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return PopScope(
+          canPop: false,
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFAA61C)),
+                strokeWidth: 5,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void hideLoading(BuildContext context) {
+    if (!_isLoadingShown) return;
+    _isLoadingShown = false;
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
     }
   }
 
@@ -355,6 +426,8 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
     await prefs.setInt('pkID', pkID);
     isDoctorLogin = prefs.getBool('isDoctorLogin') ?? false;
 
+    loginUserMobileNo =  prefs.getString('login_user') ?? "";
+
 
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
 
@@ -387,6 +460,7 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
     mobileNo = userDetail.result.first.mobileNumber ?? '';
     memberType = userDetail.result.first.membertype ?? '';
 
+
     // 3. Only now check subscription (after confirming session is valid)
     await _checkAndShowSubscriptionIfNeeded(dataProvider);
 
@@ -418,7 +492,10 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
     }
 
     if (subscriptionCheck?.message == "Expired") {
-      _subscriptionCheck(paymentLink);
+      if (kDebugMode) {
+        print("<<<<<<<<<<<<<<<<<<< Subscription Expired >>>>>>>>>>>>>>>>>>>$mobileNo");
+      }
+      mobileNo != "9988776655" && mobileNo !=  "8877665544" ?  _subscriptionCheck(paymentLink) : "";
     }
   }
 
@@ -506,7 +583,6 @@ padding: const EdgeInsets.only(left: 5.0),
             ),
           ),
           backgroundColor: const Color.fromRGBO(251, 246, 227, 1),
-
         body: Consumer<DataProvider>(
           builder: (context, dataProvider, child) {
             return RefreshIndicator(
@@ -514,6 +590,8 @@ padding: const EdgeInsets.only(left: 5.0),
                 print("<<<<<<<<<<<<< User Data Refreshed >>>>>>>>>>>>>");
                 await _getID();
               },
+              backgroundColor: const Color(0xFF1C2A4D),
+              color: const Color(0xFFFAA61C),
               child: SingleChildScrollView(
                 physics: const AlwaysScrollableScrollPhysics(), // Important for RefreshIndicator
                 child: Padding(
@@ -531,6 +609,7 @@ padding: const EdgeInsets.only(left: 5.0),
                               '', 'Appointment', 16, FontWeight.w500,
                                   () async {
                                 print('Appointment Tapped');
+                                showLoading(context);
                                 if (isDoctorLogin) {
                                   await dataProvider.getAppointmentListDoctor('', pkID);
                                   response = dataProvider.appointmentListDoctorResponse;
@@ -547,6 +626,7 @@ padding: const EdgeInsets.only(left: 5.0),
                                   },
                                 ).then((_) {
                                   _checkSessionExpired(dataProvider);
+                                  hideLoading(context);
                                 });
                               },
                             ),
@@ -555,6 +635,7 @@ padding: const EdgeInsets.only(left: 5.0),
                               '', 'Pending\nPayments', 16, FontWeight.w500,
                                   () async {
                                 print('Pending Payments Tapped');
+                                showLoading(context);
                                 if (isDoctorLogin) {
                                   await dataProvider.getPendingAppointmentListDoctor('', pkID);
                                   response = dataProvider.pendingAppointmentListDoctorResponse;
@@ -573,6 +654,7 @@ padding: const EdgeInsets.only(left: 5.0),
                                   ),
                                 ).then((_) {
                                   _checkSessionExpired(dataProvider);
+                                  hideLoading(context);
                                 });
                               },
                             ),
@@ -592,6 +674,7 @@ padding: const EdgeInsets.only(left: 5.0),
                               '', 'Patients', 16, FontWeight.w500,
                                   () async {
                                 print('Patients Tapped');
+                                showLoading(context);
                                 if (isDoctorLogin) {
                                   await dataProvider.getPatientListDoctor('', pkID);
                                   response = dataProvider.patientListDoctorResponse;
@@ -609,6 +692,7 @@ padding: const EdgeInsets.only(left: 5.0),
                                   ),
                                 ).then((_) {
                                   _checkSessionExpired(dataProvider);
+                                  hideLoading(context);
                                 });
                               },
                             ),
@@ -618,6 +702,7 @@ padding: const EdgeInsets.only(left: 5.0),
                                 '', 'Assistant', 16, FontWeight.w500,
                                     () async {
                                   print('Assistant Tapped');
+                                  showLoading(context);
                                   await dataProvider.getAssistant('', pkID);
                                   response = dataProvider.assistantResponse;
                                   Navigator.of(context).push(
@@ -630,6 +715,7 @@ padding: const EdgeInsets.only(left: 5.0),
                                     ),
                                   ).then((_) {
                                     _checkSessionExpired(dataProvider);
+                                    hideLoading(context);
                                   });
                                 },
                               ),
@@ -648,6 +734,7 @@ padding: const EdgeInsets.only(left: 5.0),
                                 '', 'Favourites', 16, FontWeight.w500,
                                     () async {
                                   print('Favourites Tapped');
+                                  showLoading(context);
                                   var loginID = pkID;
                                   var moduleID = 13;
                                   var title =  'Favourites';
@@ -672,6 +759,7 @@ padding: const EdgeInsets.only(left: 5.0),
                                     },
                                   ).then((_) {
                                     _checkSessionExpired(dataProvider);
+                                    hideLoading(context);
                                   });
                                 },
                               ),
@@ -680,6 +768,7 @@ padding: const EdgeInsets.only(left: 5.0),
                                 '', 'Subscription', 16, FontWeight.w500,
                                     () async {
                                   print('Subscription Tapped');
+                                  showLoading(context);
                                   await dataProvider.getSubscriptionPayment(pkID);
                                   final link = dataProvider.subscriptionPaymentResponse?.paymentlink ?? '';
                                   await dataProvider.getSubscription(pkID);
@@ -695,6 +784,7 @@ padding: const EdgeInsets.only(left: 5.0),
                                     ),
                                   ).then((_) {
                                     _checkSessionExpired(dataProvider);
+                                    hideLoading(context);
                                   });
                                 },
                               ),

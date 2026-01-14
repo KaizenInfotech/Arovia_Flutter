@@ -173,7 +173,7 @@ Status           : $status
           '/otpscreen',
           arguments: {
             'username': otp,
-            'phn': _phoneController.text,
+            'phn': _phoneController.text.trim(),
             'phnName': deviceName,
             'phnVersion': deviceVersion,
             'imei': imei,
@@ -181,6 +181,9 @@ Status           : $status
             'token': deviceToken
           },
         );
+
+        final SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('login_user',_phoneController.text.trim());
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(content: Text("Mobile Number not exist")));

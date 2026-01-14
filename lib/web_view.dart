@@ -23,6 +23,7 @@ class WebViewContainer extends StatefulWidget {
 
 class _SimpleWebViewState extends State<WebViewContainer> {
   InAppWebViewController? _webViewController;
+  bool _isLoading = true;
 
    @override
   Widget build(BuildContext context) { final dataProvider = Provider.of<DataProvider>(context);
@@ -71,7 +72,8 @@ class _SimpleWebViewState extends State<WebViewContainer> {
              Navigator.pop(context,true);
           }, icon: Icon(Icons.arrow_back)),
         ),
-        body: Column(
+        body: Stack(
+          alignment: AlignmentGeometry.center,
          children: [
           Expanded(
              child: InAppWebView(
@@ -85,8 +87,42 @@ class _SimpleWebViewState extends State<WebViewContainer> {
                onWebViewCreated: (controller) {
               _webViewController = controller;
             },
-          ),
-          )
+               onProgressChanged: (controller, progress) {
+                 // Hide loader when loading is basically complete
+                 if (progress >= 90) {   // 90–100 is usually when content is visible
+                   setState(() {
+                     _isLoading = false;
+                   });
+                 } else if (!_isLoading) {
+                   setState(() {
+                     _isLoading = true;
+                   });
+                 }
+               },
+               // Optional: better UX for navigation inside the page
+               onLoadStart: (controller, url) {
+                 setState(() => _isLoading = true);
+               },
+               onLoadStop: (controller, url) {
+                 setState(() => _isLoading = false);
+               },
+               // Optional: handle errors
+               onReceivedError: (controller, request, error) {
+                 setState(() => _isLoading = false);
+                 // You can show error snackbar / dialog here if needed
+               },
+             ),),
+              if(_isLoading)
+           Positioned(
+             top: MediaQuery.of(context).size.height / 2,
+             child: Container(
+               color: Colors.white.withOpacity(0.85), // slight dim
+               child: CircularProgressIndicator(
+                 valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFAA61C)),
+                 strokeWidth: 4.5,
+               ),
+             ),
+           ),
          ],
         )
       ),

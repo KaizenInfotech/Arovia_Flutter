@@ -751,7 +751,7 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('SUBSCRIPTION SUCCESSFUL-----------------------------------------');
+      print('SUBSCRIPTION SUCCESSFUL-----------------------------------------${response.body}');
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");

@@ -26,9 +26,54 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
   // int? pkid;
   Result? response;
 
+  bool _isLoadingShown = false;
+
   @override
   void initState() {
     super.initState();
+  }
+
+  void showLoading(BuildContext context) {
+    if (_isLoadingShown) return;
+    _isLoadingShown = true;
+
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext dialogContext) {
+        return PopScope(
+          canPop: false,
+          child: Center(
+            child: Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.15),
+                    blurRadius: 20,
+                    offset: const Offset(0, 10),
+                  ),
+                ],
+              ),
+              child: const CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Color(0xFFFAA61C)),
+                strokeWidth: 5,
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void hideLoading(BuildContext context) {
+    if (!_isLoadingShown) return;
+    _isLoadingShown = false;
+    if (Navigator.canPop(context)) {
+      Navigator.pop(context);
+    }
   }
 
   @override
@@ -120,6 +165,7 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
                   children: [
                     _apntmntContainer('Scheduled\nAppointment', () async {
                       print('Scheduled Appointment Tapped');
+                      showLoading(context);
                       if (widget.isDoctorLogin ?? false) {
                         await dataProvider.getPendingAppointmentListDoctor(
                             '', widget.pkID ?? 0);
@@ -144,7 +190,9 @@ class _AppointmentDetailPageState extends State<AppointmentDetailPage> {
                             subscripPayment: null,
                           ),
                         ),
-                      );
+                      ).then((value) {
+                        hideLoading(context);
+                      },); 
                     }),
                     const SizedBox(width: 10),
                     _apntmntContainer('Completed\nAppointment', () async {
