@@ -764,30 +764,30 @@ padding: const EdgeInsets.only(left: 5.0),
                                 },
                               ),
                               Spacer(),
-                              _welcomeContainer(
-                                '', 'Subscription', 16, FontWeight.w500,
-                                    () async {
-                                  print('Subscription Tapped');
-                                  showLoading(context);
-                                  await dataProvider.getSubscriptionPayment(pkID);
-                                  final link = dataProvider.subscriptionPaymentResponse?.paymentlink ?? '';
-                                  await dataProvider.getSubscription(pkID);
-                                  response = dataProvider.subscriptionResponse;
+                              loginUserMobileNo != "9988776655" && loginUserMobileNo !=  "8877665544" ?  _welcomeContainer(
+                            '', 'Subscription', 16, FontWeight.w500,
+                                () async {
+                              print('Subscription Tapped');
+                              showLoading(context);
+                              await dataProvider.getSubscriptionPayment(pkID);
+                              final link = dataProvider.subscriptionPaymentResponse?.paymentlink ?? '';
+                              await dataProvider.getSubscription(pkID);
+                              response = dataProvider.subscriptionResponse;
 
-                                  Navigator.of(context).push(
-                                    MaterialPageRoute(
-                                      builder: (context) => ListingPage(
-                                        headtitle: 'Subscription',
-                                        response: response,
-                                        subscripPayment: link,
-                                      ),
-                                    ),
-                                  ).then((_) {
-                                    _checkSessionExpired(dataProvider);
-                                    hideLoading(context);
-                                  });
-                                },
-                              ),
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => ListingPage(
+                                    headtitle: 'Subscription',
+                                    response: response,
+                                    subscripPayment: link,
+                                  ),
+                                ),
+                              ).then((_) {
+                                _checkSessionExpired(dataProvider);
+                                hideLoading(context);
+                              });
+                            },
+                          ) : const SizedBox.shrink(),
                             ],
                           ),
                         ),
