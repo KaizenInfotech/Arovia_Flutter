@@ -327,64 +327,66 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
         )
             : Padding(
           padding: const EdgeInsets.all(50.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              SizedBox(
-                // width: 300,
-                // height: 300,
-                child: Image.asset(
-                  'assets/arovia_logo.png',
-                  fit: BoxFit.contain,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                SizedBox(
+                  // width: 300,
+                  // height: 300,
+                  child: Image.asset(
+                    'assets/arovia_logo.png',
+                    fit: BoxFit.contain,
+                  ),
                 ),
-              ),
-              _textFunction('Welcome Back!', 24, FontWeight.w500),
-              _textFunction('Use Credentials to access your account', 15,
-                  FontWeight.w300),
-              const SizedBox(
-                height: 40,
-              ),
-              _welcomeContainer('assets/doctor.png', 'I’m a Doctor',
-                      () async {
-                    debugPrint('Doctor Tapped');
-                    dataProvider.dataProviderFunction(true);
-                    await dataProvider.getAuthToken();
-                    final SharedPreferences prefs =
-                    await SharedPreferences.getInstance();
-                    await prefs.setString(
-                        'auth_token', dataProvider.authToken?.token ?? '');
-                    await prefs.setBool(
-                        'isDoctorLogin', dataProvider.isDoctor ?? false);
-                    Navigator.pushNamed(
-                      context,
-                      '/getStart',
-                      arguments: {'username': 'Doctor'},
-                    );
-                    print('AUTHTOKEN-------${dataProvider.authToken?.token}');
-                  }),
-              const SizedBox(
-                height: 40,
-              ),
-              _welcomeContainer('assets/nurse.png', 'I’m an Assistant',
-                      () async {
-                    print('Nurse Tapped');
-                    dataProvider.dataProviderFunction(false);
-                    await dataProvider.getAuthToken();
-                    final SharedPreferences prefs =
-                    await SharedPreferences.getInstance();
-                    await prefs.setString(
-                        'auth_token', dataProvider.authToken?.token ?? '');
-                    await prefs.setBool(
-                        'isDoctorLogin', dataProvider.isDoctor ?? false);
-                    Navigator.pushNamed(
-                      context,
-                      '/getStart',
-                      arguments: {'username': 'Assistant'},
-                    );
-                    print('AUTHTOKEN-------${dataProvider.authToken?.token}');
-                  }),
-            ],
+                _textFunction('Welcome Back!', 24, FontWeight.w500),
+                _textFunction('Use Credentials to access your account', 15,
+                    FontWeight.w300),
+                const SizedBox(
+                  height: 40,
+                ),
+                _welcomeContainer('assets/doctor.png', 'I’m a Doctor',
+                        () async {
+                      debugPrint('Doctor Tapped');
+                      dataProvider.dataProviderFunction(true);
+                      await dataProvider.getAuthToken();
+                      final SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                      await prefs.setString(
+                          'auth_token', dataProvider.authToken?.token ?? '');
+                      await prefs.setBool(
+                          'isDoctorLogin', dataProvider.isDoctor ?? false);
+                      Navigator.pushNamed(
+                        context,
+                        '/getStart',
+                        arguments: {'username': 'Doctor'},
+                      );
+                      print('AUTHTOKEN-------${dataProvider.authToken?.token}');
+                    }),
+                const SizedBox(
+                  height: 40,
+                ),
+                _welcomeContainer('assets/nurse.png', 'I’m an Assistant',
+                        () async {
+                      print('Nurse Tapped');
+                      dataProvider.dataProviderFunction(false);
+                      await dataProvider.getAuthToken();
+                      final SharedPreferences prefs =
+                      await SharedPreferences.getInstance();
+                      await prefs.setString(
+                          'auth_token', dataProvider.authToken?.token ?? '');
+                      await prefs.setBool(
+                          'isDoctorLogin', dataProvider.isDoctor ?? false);
+                      Navigator.pushNamed(
+                        context,
+                        '/getStart',
+                        arguments: {'username': 'Assistant'},
+                      );
+                      print('AUTHTOKEN-------${dataProvider.authToken?.token}');
+                    }),
+              ],
+            ),
           ),
         ),
       );
