@@ -9,7 +9,7 @@ class GetStarted extends StatelessWidget {
   Widget build(BuildContext context) {
     final isDoctor = Provider.of<DataProvider>(context).isDoctor ?? false;
     return Scaffold(
-      backgroundColor: const Color.fromRGBO(251, 246, 227, 1),
+      backgroundColor: Colors.white,//const Color.fromRGBO(251, 246, 227, 1),
       appBar: AppBar(
         backgroundColor: const Color.fromRGBO(251, 246, 227, 1),
         elevation: 0,bottomOpacity: 0,scrolledUnderElevation: 0,
@@ -20,6 +20,7 @@ class GetStarted extends StatelessWidget {
             children: [
               // Image section – no fixed height needed anymore
               Container(
+                color: const Color.fromRGBO(251, 246, 227, 1),
                 constraints: BoxConstraints(
                   maxHeight: MediaQuery.of(context).size.height * 0.4,
                 ),
