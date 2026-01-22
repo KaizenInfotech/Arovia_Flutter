@@ -1,3 +1,6 @@
+import 'dart:async';
+import 'dart:io';
+
 import 'package:arovia/api_services.dart';
 import 'package:arovia/data_model.dart';
 import 'package:flutter/material.dart';
@@ -179,14 +182,23 @@ class DataProvider with ChangeNotifier {
   Future<void> getAuthToken() async {
     _loading = true;
     _authError = '';
+    _authToken = null;
     notifyListeners();
     try {
       _authToken = await ApiService.authTokenAPI();
+    } on TimeoutException catch (_) {
+      _authError = 'Request timed out. Please check your internet connection.';
+    } on SocketException {
+      _authError = 'No internet connection. Please try again.';
+    } on HttpException catch (e) {
+      _authError = e.message;
     } catch (e) {
       _authError = e.toString();
+      _authToken = null;
     } finally {
+      print("authTokenAPI :: $_authToken");
       _loading = false;
-      notifyListeners(); // Move notify here so it always fires
+      notifyListeners();
     }
   }
 
@@ -198,6 +210,12 @@ class DataProvider with ChangeNotifier {
     try {
       _loginResponse = await ApiService.loginResultAPI(
           mobileNo, memType, devName, imei, devToken, versionNo);
+    } on TimeoutException catch (_) {
+      _authError = 'Request timed out. Please check your internet connection.';
+    } on SocketException {
+      _authError = 'No internet connection. Please try again.';
+    } on HttpException catch (e) {
+      _authError = e.message;
     } catch (e) {
       _authError = e.toString();
     } finally {
@@ -215,6 +233,12 @@ class DataProvider with ChangeNotifier {
     try {
       _sessionTimeOutResponse =
           await ApiService.sessionTimeOutAPI(pkMemId, imei);
+    } on TimeoutException catch (_) {
+      _authError = 'Request timed out. Please check your internet connection.';
+    } on SocketException {
+      _authError = 'No internet connection. Please try again.';
+    } on HttpException catch (e) {
+      _authError = e.message;
     } catch (e) {
       _authError = e.toString();
     }

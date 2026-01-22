@@ -1,4 +1,6 @@
+import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
 import 'package:arovia/data_model.dart';
 import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
@@ -22,7 +24,9 @@ try {
       url,
       headers: {'Content-Type': 'application/json'},
       body: jsonEncode(requestBody),
-    );
+    ).timeout(const Duration(seconds: 10));
+
+    print("response.statusCode :: $response.statusCode");
 
     if (response.statusCode == 200) {
       if (kDebugMode) {
@@ -32,7 +36,18 @@ try {
     } else {
       throw Exception("Failed to login");
     }
-  } catch (e) {
+  }
+on TimeoutException catch (_) {
+  print("Request timed out. Please check your internet connection.");
+  throw Exception("Request timed out. Please check your internet connection.");
+} on SocketException {
+  print("No internet connection. Please try again.");
+  throw Exception("No internet connection. Please try again.");
+} on HttpException catch (e) {
+  print("HttpException :: ${e.message}");
+  throw Exception(e.message);
+
+} catch (e) {
     if (kDebugMode) {
       print("Error: $e");
     }

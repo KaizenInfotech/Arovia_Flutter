@@ -346,45 +346,149 @@ class _WelcomeScreenState extends State<WelcomeScreen> {
                 const SizedBox(
                   height: 40,
                 ),
-                _welcomeContainer('assets/doctor.png', 'I’m a Doctor',
-                        () async {
-                      debugPrint('Doctor Tapped');
-                      dataProvider.dataProviderFunction(true);
+                // _welcomeContainer('assets/doctor.png', 'I’m a Doctor',
+                //         () async {
+                //       debugPrint('Doctor Tapped');
+                //       dataProvider.dataProviderFunction(true);
+                //       await dataProvider.getAuthToken();
+                //       final SharedPreferences prefs =
+                //       await SharedPreferences.getInstance();
+                //       await prefs.setString(
+                //           'auth_token', dataProvider.authToken?.token ?? '');
+                //       await prefs.setBool(
+                //           'isDoctorLogin', dataProvider.isDoctor ?? false);
+                //       if(dataProvider.authToken?.token != null) {
+                //         print('AUTH TOKEN IS NULL');
+                //         Navigator.pushNamed(
+                //         context,
+                //         '/getStart',
+                //         arguments: {'username': 'Doctor'},
+                //       );
+                //       }
+                //       print('AUTHTOKEN-------${dataProvider.authToken?.token}');
+                //     }),
+
+                _welcomeContainer(
+                  'assets/doctor.png',
+                  'I’m a Doctor',
+                      () async {
+                    debugPrint('Doctor Tapped');
+                    dataProvider.dataProviderFunction(true);
+
+                    try {
+                      // Call the API
                       await dataProvider.getAuthToken();
-                      final SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                      await prefs.setString(
-                          'auth_token', dataProvider.authToken?.token ?? '');
-                      await prefs.setBool(
-                          'isDoctorLogin', dataProvider.isDoctor ?? false);
-                      Navigator.pushNamed(
-                        context,
-                        '/getStart',
-                        arguments: {'username': 'Doctor'},
+
+                      // Save to shared preferences
+                      final SharedPreferences prefs = await SharedPreferences.getInstance();
+                      String? token = dataProvider.authToken?.token;
+
+                      await prefs.setString('auth_token', token ?? '');
+                      await prefs.setBool('isDoctorLogin', dataProvider.isDoctor ?? false);
+
+                      // Only navigate if we actually got a valid token
+                      if (token != null && token.isNotEmpty) {
+                        print('AUTH TOKEN SUCCESS: $token');
+                        Navigator.pushNamed(
+                          context,
+                          '/getStart',
+                          arguments: {'username': 'Doctor'},
+                        );
+                      } else {
+                        print('AUTH TOKEN IS NULL or EMPTY - NOT NAVIGATING');
+                        // Optional: Show error message to user
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Login failed. Please check your internet connection.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      print('Error during authentication: $e');
+                      // Show error message
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Failed to login: ${e.toString()}'),
+                          backgroundColor: Colors.red,
+                        ),
                       );
-                      print('AUTHTOKEN-------${dataProvider.authToken?.token}');
-                    }),
+                    }
+
+                    print('AUTHTOKEN-------${dataProvider.authToken?.token}');
+                  },
+                ),
                 const SizedBox(
                   height: 40,
                 ),
-                _welcomeContainer('assets/nurse.png', 'I’m an Assistant',
-                        () async {
-                      print('Nurse Tapped');
-                      dataProvider.dataProviderFunction(false);
+                // _welcomeContainer('assets/nurse.png', 'I’m an Assistant',
+                //         () async {
+                //       print('Nurse Tapped');
+                //       dataProvider.dataProviderFunction(false);
+                //       await dataProvider.getAuthToken();
+                //       final SharedPreferences prefs =
+                //       await SharedPreferences.getInstance();
+                //       await prefs.setString(
+                //           'auth_token', dataProvider.authToken?.token ?? '');
+                //       await prefs.setBool(
+                //           'isDoctorLogin', dataProvider.isDoctor ?? false);
+                //       Navigator.pushNamed(
+                //         context,
+                //         '/getStart',
+                //         arguments: {'username': 'Assistant'},
+                //       );
+                //       print('AUTHTOKEN-------${dataProvider.authToken?.token}');
+                //     }),
+
+                _welcomeContainer(
+                  'assets/nurse.png',
+                  'I’m an Assistant',
+                      () async {
+                    print('Nurse Tapped');
+                    dataProvider.dataProviderFunction(false); // false = Assistant/Nurse
+
+                    try {
+                      // Attempt to get auth token
                       await dataProvider.getAuthToken();
-                      final SharedPreferences prefs =
-                      await SharedPreferences.getInstance();
-                      await prefs.setString(
-                          'auth_token', dataProvider.authToken?.token ?? '');
-                      await prefs.setBool(
-                          'isDoctorLogin', dataProvider.isDoctor ?? false);
-                      Navigator.pushNamed(
-                        context,
-                        '/getStart',
-                        arguments: {'username': 'Assistant'},
+
+                      final SharedPreferences prefs = await SharedPreferences.getInstance();
+                      final String? token = dataProvider.authToken?.token;
+
+                      // Save token (even if null — it will be empty string)
+                      await prefs.setString('auth_token', token ?? '');
+                      await prefs.setBool('isDoctorLogin', dataProvider.isDoctor ?? false);
+
+                      // ONLY navigate if we actually received a valid token
+                      if (token != null && token.isNotEmpty) {
+                        print('AUTH TOKEN SUCCESS: $token');
+                        Navigator.pushNamed(
+                          context,
+                          '/getStart',
+                          arguments: {'username': 'Assistant'},
+                        );
+                      } else {
+                        print('AUTH TOKEN IS NULL or EMPTY → NOT NAVIGATING');
+                        // Show feedback to user
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Login failed. Please check your internet connection.'),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                      }
+                    } catch (e) {
+                      print('Authentication error: $e');
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: Text('Failed to login: ${e.toString()}'),
+                          backgroundColor: Colors.red,
+                        ),
                       );
-                      print('AUTHTOKEN-------${dataProvider.authToken?.token}');
-                    }),
+                    }
+
+                    print('AUTHTOKEN-------${dataProvider.authToken?.token}');
+                  },
+                ),
               ],
             ),
           ),
