@@ -38,6 +38,8 @@ class _ListingPageState extends State<ListingPage> {
   String? appntforapp;
   String? mobforapp;
   String? patNameforapp;
+
+  String loginUserMobileNo = "";
   List<ResultElement?> status = [];
   List<ResultElement?> filteredStatus = [];
   bool isDoctorLogin = false;
@@ -70,6 +72,8 @@ class _ListingPageState extends State<ListingPage> {
 
     // Now safe to filter data
     _filteredData('');
+
+    loginUserMobileNo =  prefs.getString('login_user') ?? "";
   }
 
   void _filteredData(String query) {
@@ -1242,6 +1246,7 @@ class _ListingPageState extends State<ListingPage> {
 
   Widget _subscriptionPage(
       String img, String header, String subsData, String subsPayData, bool isIconHide) {
+
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: 10.0),
       child: Container(
@@ -1285,30 +1290,33 @@ class _ListingPageState extends State<ListingPage> {
                                 fontWeight: FontWeight.bold,
                                 color: Color.fromRGBO(250, 166, 28, 1)),
                           ),
-                          // Spacer(),
-                          // if (isIconHide)
-                          // InkWell(
-                          //   onTap: () {
-                          //     _launchURL(subsPayData);
-                          //   },
-                          //   child: Container(
-                          //     width: 160,
-                          //     decoration: BoxDecoration(
-                          //       color: const Color.fromRGBO(250, 166, 28, 1),
-                          //       borderRadius: BorderRadius.circular(8),
-                          //     ),
-                          //     child: const Padding(
-                          //       padding: EdgeInsets.all(10.0),
-                          //       child: Center(
-                          //         child: Text('Pay',
-                          //             style: TextStyle(
-                          //                 fontSize: 18,
-                          //                 fontWeight: FontWeight.w600,
-                          //                 color: Colors.white)),
-                          //       ),
-                          //     ),
-                          //   ),
-                          // )
+                          if(loginUserMobileNo != "9988776655" && loginUserMobileNo !=  "8877665544")...[
+                            Spacer(),
+                            if (isIconHide)
+                              InkWell(
+                                onTap: () {
+                                  _launchURL(subsPayData);
+                                },
+                                child: Container(
+                                  width: 160,
+                                  decoration: BoxDecoration(
+                                    color: const Color.fromRGBO(250, 166, 28, 1),
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                  child: const Padding(
+                                    padding: EdgeInsets.all(10.0),
+                                    child: Center(
+                                      child: Text('Pay',
+                                          style: TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.white)),
+                                    ),
+                                  ),
+                                ),
+                              )
+                          ]
+
                       ],
                     )
                     // isIconHide
