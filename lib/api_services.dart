@@ -26,25 +26,27 @@ try {
       body: jsonEncode(requestBody),
     ).timeout(const Duration(seconds: 10));
 
-    print("response.statusCode :: $response.statusCode");
 
     if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print('AUTHTOKENAPI SUCCESSFUL-----------------------------------------');
-      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   }
 on TimeoutException catch (_) {
-  print("Request timed out. Please check your internet connection.");
+  if (kDebugMode) {
+    print("Request timed out. Please check your internet connection.");
+  }
   throw Exception("Request timed out. Please check your internet connection.");
 } on SocketException {
-  print("No internet connection. Please try again.");
+  if (kDebugMode) {
+    print("No internet connection. Please try again.");
+  }
   throw Exception("No internet connection. Please try again.");
 } on HttpException catch (e) {
-  print("HttpException :: ${e.message}");
+  if (kDebugMode) {
+    print("HttpException :: ${e.message}");
+  }
   throw Exception(e.message);
 
 } catch (e) {
@@ -56,11 +58,11 @@ on TimeoutException catch (_) {
 }
 
 static Future<Result> loginResultAPI(
-  String mobileNo, 
-  String memType, 
-  String devName, 
-  String imei, 
-  String devToken, 
+  String mobileNo,
+  String memType,
+  String devName,
+  String imei,
+  String devToken,
   String versionNo
   ) async {
 
@@ -89,24 +91,18 @@ try {
     );
 
     if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print('LOGINRESULTAPI SUCCESSFUL-----------------------------------------');
-      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   } catch (e) {
-    if (kDebugMode) {
-      print("Error: $e");
-    }
     throw Exception("Failed to login");
   }
 }
 
 static Future<Result> sessionTimeOutAPI(
   int pkMemId,
-  String imei, 
+  String imei,
   ) async {
 
   final url = Uri.parse("$baseUrl/Login/SessionTimeOut_VersionCheck");
@@ -130,9 +126,6 @@ try {
     );
 
     if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print('SESSIONTIMEOUTAPI SUCCESSFUL-----------------------------------------');
-      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
@@ -146,7 +139,7 @@ try {
 }
 
 static Future<Result> userDetailAPI(
-  int pkMemId, 
+  int pkMemId,
   ) async {
 
   final url = Uri.parse("$baseUrl/Login/Login_User_Details");
@@ -168,9 +161,6 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print('USERDETAILAPI SUCCESSFUL-----------------------------------------${response.body}');
-      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
@@ -206,9 +196,6 @@ static Future<Result> logoutAPI(
     );
 
     if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print('LOGOUTAPI SUCCESSFUL-----------------------------------------${response.body}');
-      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to logout: ${response.statusCode}");
@@ -223,7 +210,7 @@ static Future<Result> logoutAPI(
 
 static Future<Result> appointmentlistDoctorAPI(
   String searchText,
-  int fkMemId, 
+  int fkMemId,
   ) async {
 
   final url = Uri.parse("$baseUrl/Appointment/get_Appointmentlist_for_Doctor");
@@ -246,9 +233,6 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print('APPOINTMENTLISTDOCTORAPI SUCCESSFUL-----------------------------------------${response.body}');
-      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
@@ -263,7 +247,7 @@ try {
 
 static Future<Result> appointmentlistAssistantAPI(
   String searchText,
-  int fkMemId, 
+  int fkMemId,
   ) async {
 
   final url = Uri.parse("$baseUrl/Appointment/get_Appointmentlist_for_Assistant");
@@ -286,11 +270,6 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print('APPOINTMENTLISTURl----$url');
-        print('APPOINTMENTLISTPARAM----$requestBody');
-        print('APPOINTMENTLISTASSISTANTAPI SUCCESSFUL-----------------------------------------${response.body}');
-      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
@@ -305,7 +284,7 @@ try {
 
 static Future<Result> pendingAppointmentlistDoctorAPI(
   String searchText,
-  int fkMemId, 
+  int fkMemId,
   ) async {
 
   final url = Uri.parse("$baseUrl/Appointment/get_Pending_Appointmentlist_for_Doctor");
@@ -316,12 +295,6 @@ if (kDebugMode) {
   "txt_search": searchText,
   "fk_main_member_master_id_as_doctor_id": fkMemId
 };
-
-  if (kDebugMode) {
-    print("pendingAppointmentlistDoctorAPI <<<>>>>  $baseUrl/Appointment/get_Pending_Appointmentlist_for_Doctor");
-    print("pendingAppointmentlistDoctorAPI requestBody <<<>>>>  $requestBody");
-  }
-
 
 try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -336,9 +309,6 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print('PENDINGAPPOINTMENTLISTDOCTORAPI SUCCESSFUL-----------------------------------------');
-      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
@@ -353,7 +323,7 @@ try {
 
 static Future<Result> pendingAppointmentlistAssistantAPI(
   String searchText,
-  int fkMemId, 
+  int fkMemId,
   ) async {
 
   final url = Uri.parse("$baseUrl/Appointment/get_Pending_Appointmentlist_for_Assistant");
@@ -362,12 +332,6 @@ static Future<Result> pendingAppointmentlistAssistantAPI(
   "txt_search": searchText,
   "fk_main_member_master_id_as_Assistant_id": fkMemId
 };
-
-  if (kDebugMode) {
-    print("pendingAppointmentlistAssistantAPI :: $url");
-    print("pendingAppointmentlistAssistantAPI requestBody :: $requestBody");
-  }
-
 
 try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -382,9 +346,6 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print('PENDINGAPPOINTMENTLISTASSISTANTAPI SUCCESSFUL-----------------------------------------${response.body}');
-      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
@@ -399,7 +360,7 @@ try {
 
 static Future<Result> patientListDoctorAPI(
   String searchText,
-  int fkMemId, 
+  int fkMemId,
   ) async {
 
   final url = Uri.parse("$baseUrl/Patients/get_patientlist_for_Doctor");
@@ -422,9 +383,6 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print('PATIENTLISTDOCTORAPI SUCCESSFUL-----------------------------------------');
-      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
@@ -439,7 +397,7 @@ try {
 
 static Future<Result> patientListAssistantAPI(
   String searchText,
-  int fkMemId, 
+  int fkMemId,
   ) async {
 
   final url = Uri.parse("$baseUrl/Patients/get_patientlist_for_Assistant");
@@ -462,9 +420,6 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print('PATIENTLISTASSISTANTAPI SUCCESSFUL-----------------------------------------');
-      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
@@ -481,7 +436,7 @@ try {
 
 static Future<Result> searchAppointmentDoctorAPI(
   String mobileNo,
-  int fkMemId, 
+  int fkMemId,
   ) async {
 
   final url = Uri.parse("$baseUrl/Appointment/get_search_Appointment_by_Doctor");
@@ -504,9 +459,6 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print('SEARCHAPPOINTMENTDOCTORAPI SUCCESSFUL-----------------------------------------');
-      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
@@ -521,7 +473,7 @@ try {
 
 static Future<Result> searchAppointmentAssistantAPI(
   String mobileNo,
-  int fkMemId, 
+  int fkMemId,
   ) async {
 
   final url = Uri.parse("$baseUrl/Appointment/get_search_Appointment_by_Assistant");
@@ -544,9 +496,6 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print('SEARCHAPPOINTMENTASSISTANTAPI SUCCESSFUL-----------------------------------------');
-      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
@@ -561,8 +510,8 @@ try {
 
 static Future<Result> cancelAppoinmentAPI(
   String remark,
-  int fkMemId, 
-  int deletedBy, 
+  int fkMemId,
+  int deletedBy,
   ) async {
 
   final url = Uri.parse("$baseUrl/Appointment/Cancle_Appointment");
@@ -586,9 +535,6 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print('CANCELAPPOINTMENTAPI SUCCESSFUL-----------------------------------------');
-      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
@@ -602,7 +548,7 @@ try {
 }
 
 static Future<Result> appoinmentDetailsAPI(
-  int fkMemId, 
+  int fkMemId,
   ) async {
 
   final url = Uri.parse("$baseUrl/Appointment/get_Appointment_Details_By_ID");
@@ -624,19 +570,20 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('APPOINTMENTDETAILSAPI SUCCESSFUL-----------------------------------------');
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("Failed to login");
   }
 }
 
 static Future<Result> patientHistoryAPI(
-  String searchText, 
+  String searchText,
   int patientID,
   ) async {
 
@@ -647,6 +594,9 @@ static Future<Result> patientHistoryAPI(
    "fk_Patient_id": patientID
 };
 
+  print("url : $url");
+  print("requestBody : $requestBody");
+
 try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
@@ -660,19 +610,20 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('PATIENTHISTORYAPI SUCCESSFUL-----------------------------------------');
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("PATIENTHISTORYAPI Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("PATIENTHISTORYAPI Failed to login");
   }
 }
 
 static Future<Result> patientDocumentListAPI(
-  String searchText, 
+  String searchText,
   int patientID,
   ) async {
 
@@ -683,6 +634,9 @@ static Future<Result> patientDocumentListAPI(
    "fk_Patient_id": patientID
 };
 
+  print("url : $url");
+  print("requestBody : $requestBody");
+
 try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
@@ -696,19 +650,20 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('PATIENTDocumentAPI SUCCESSFUL-----------------------------------------');
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("PATIENTDocumentAPI Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("PATIENTDocumentAPI Failed to login");
   }
 }
 
 static Future<Result> patientDocumentDeleteAPI(
-  int deletedBy,  
+  int deletedBy,
   int fkdocID,
   ) async {
 
@@ -732,19 +687,20 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('PATIENTDocumentDeleteAPI SUCCESSFUL-----------------------------------------');
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("PATIENTDocumentDeleteAPI Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("PATIENTDocumentDeleteAPI Failed to login");
   }
 }
 
 static Future<Result> subscriptionDetailAPI(
-  int fkMemId, 
+  int fkMemId,
   ) async {
 
   final url = Uri.parse("$baseUrl/subscription/get_subsciption_details");
@@ -766,19 +722,20 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('SUBSCRIPTION SUCCESSFUL-----------------------------------------${response.body}');
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("Failed to login");
   }
 }
 
 static Future<Result> subscriptionPaymentDoctorAPI(
-  int fkMemId, 
+  int fkMemId,
   ) async {
 
   final url = Uri.parse("$baseUrl/subscription/buy_the_subscription_plan");
@@ -800,19 +757,20 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('SUBSCRIPTION PAYMENT SUCCESSFUL-----------------------------------------');
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("Failed to login");
   }
 }
 
 static Future<Result> subscriptionActiveDoctorAPI(
-  int fkMemId, 
+  int fkMemId,
   ) async {
 
   final url = Uri.parse("$baseUrl/Login/check_subsciption_by_Doctor");
@@ -834,19 +792,20 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('SUBSCRIPTION ACTIVE DOCTOR SUCCESSFUL-----------------------------------------');
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("Failed to login");
   }
 }
 
 static Future<Result> subscriptionActiveAssistantAPI(
-  int fkMemId, 
+  int fkMemId,
   ) async {
 
   final url = Uri.parse("$baseUrl/Login/check_subsciption_by_assistant");
@@ -868,20 +827,21 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('SUBSCRIPTION ACTIVE ASSISTANT SUCCESSFUL-----------------------------------------');
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("Failed to login");
   }
 }
 
 static Future<Result> assistantAPI(
   String searchText,
-  int fkMemId, 
+  int fkMemId,
   ) async {
 
   final url = Uri.parse("$baseUrl/Assistant/get_assistant_list_for_Doctor");
@@ -890,9 +850,6 @@ static Future<Result> assistantAPI(
   "fk_main_member_master_id_as_doctor_id": fkMemId,
   "txt_search": searchText
 };
-
-  print("assistantAPI ::: $baseUrl/Assistant/get_assistant_list_for_Doctor");
-  print("assistantAPI requestBody ::: $requestBody");
 
 try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -907,20 +864,21 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('ASSISTANTAPI SUCCESSFUL-----------------------------------------$token');
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("ASSISTANTAPI Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("ASSISTANTAPI Failed to login");
   }
 }
 
 static Future<Result> deleteAssistantAPI(
   int fkAssisID,
-  int fkMemId, 
+  int fkMemId,
   ) async {
 
   final url = Uri.parse("$baseUrl/Assistant/Delete_assistant");
@@ -943,13 +901,14 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('ASSISTANTDELETEAPI SUCCESSFUL-----------------------------------------');
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("ASSISTANTDELETEAPI Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("ASSISTANTDELETEAPI Failed to login");
   }
 }
@@ -978,9 +937,6 @@ static Future<Weblink> weblinkAPI(
     "mobile_number": phnNo
 };
 
-  print("weblinkAPI <<<>>>>  $baseUrl/Login/Web_login_from_Mobile");
-  print("weblinkAPI requestBody <<<>>>>  $requestBody");
-
 try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('auth_token');
@@ -994,13 +950,14 @@ try {
       body: jsonEncode(requestBody),
     );
     if (response.statusCode == 200) {
-      print('WEBLINKAPI SUCCESSFUL-----------------------------------------');
       return Weblink.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("WEBLINKAPI Failed to login");
     }
   } catch (e) {
-    print("Error: $e");
+    if (kDebugMode) {
+      print("Error: $e");
+    }
     throw Exception("WEBLINKAPI Failed to login");
   }
 }
@@ -1020,19 +977,20 @@ static Future<ForceUpdate> fetchForceUpdate(String appName) async {
    );
 
    if (response.statusCode == 200) {
-    print("FORCE UPDATE API SUCCESSFUL");
     return ForceUpdate.fromJson(json.decode(response.body));
    } else {
     throw Exception("Failed to load posts");
    }
   } catch (e) {
-   print("Error: $e");
+   if (kDebugMode) {
+     print("Error: $e");
+   }
    throw Exception("Failed to login");
   }
    }
 
    static Future<Result> WhatsAppAPI(
-  int pkId, 
+  int pkId,
   ) async {
 
   final url = Uri.parse("$baseUrl/Patients/Send_Whatsup");
@@ -1040,8 +998,6 @@ static Future<ForceUpdate> fetchForceUpdate(String appName) async {
   Map<String, dynamic> requestBody = {
   "pk_Patient_id": pkId
 };
-
-  print("url :: $url || requestBody :: $requestBody");
 
 try {
     SharedPreferences prefs = await SharedPreferences.getInstance();
@@ -1055,11 +1011,7 @@ try {
         },
       body: jsonEncode(requestBody),
     );
-    print("WhatsAppAPI response :: ${response.body}");
     if (response.statusCode == 200) {
-      if (kDebugMode) {
-        print('WhatsApp API SUCCESSFUL-----------------------------------------');
-      }
       return Result.fromJson(jsonDecode(response.body));
     } else {
       throw Exception("Failed to login");

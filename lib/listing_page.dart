@@ -2,7 +2,9 @@ import 'package:arovia/data_model.dart';
 import 'package:arovia/data_provider.dart';
 import 'package:arovia/widgets/greeting_header.dart';
 import 'package:arovia/widgets/profile_photo.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -830,6 +832,50 @@ class _ListingPageState extends State<ListingPage> {
                                           itemBuilder: (context, index) {
                                             final isSelected =
                                                 selectedIndex == index;
+                                            final isStatusList = (widget.headtitle == 'Completed Appointment' ||
+                                                widget.headtitle == 'Cancelled Appointment' ||
+                                                widget.headtitle == 'Scheduled Appointment' ||
+                                                widget.headtitle == 'Pending Payments');
+
+                                            // 1. GET THE CORRECT DATA ITEM
+                                            // If we are in a filtered list, use 'status[index]', otherwise use 'response.result[index]'
+                                            final item = isStatusList ? status[index] : widget.response?.result[index];
+
+                                            // 2. PARSE THE DATE SAFELY
+                                            bool isAppointmentExpired = false;
+
+                                            // Only check expiration if the status is actually 'Scheduled'
+                                            if (item?.status == 'Scheduled' && item?.appointmentDate != null) {
+                                              try {
+                                                // Your JSON format is "31/1/2026 15:25" which matches "d/M/yyyy HH:mm"
+                                                final inputFormat = DateFormat("d/M/yyyy HH:mm");
+                                                final DateTime apptDate = inputFormat.parse(item!.appointmentDate!);
+
+                                                // Check if NOW is after the appointment date
+                                                isAppointmentExpired = DateTime.now().isAfter(apptDate);
+                                              } catch (e) {
+                                                print("Error parsing date for ${item?.patiantName}: $e");
+                                                isAppointmentExpired = false;
+                                              }
+                                            }
+
+                                            // final inputFormat = DateFormat("d/M/yyyy HH:mm");
+                                            //
+                                            // final apptDateString =
+                                            //     widget.response?.result[index].appointmentDate;
+                                            //
+                                            // DateTime? apptDate;
+                                            //
+                                            // if (apptDateString != null && apptDateString.isNotEmpty) {
+                                            //   apptDate = inputFormat.parse(apptDateString);
+                                            // }
+                                            //
+                                            // final bool isAppointmentExpired =
+                                            //     apptDate != null &&
+                                            //         widget.response?.result[index].status == 'Scheduled' &&
+                                            //         apptDate.isBefore(DateTime.now());
+
+
                                             return InkWell(
                                               onTap: () {
                                                 setState(() {
@@ -880,10 +926,11 @@ class _ListingPageState extends State<ListingPage> {
                                               },
                                               child: Container(
                                                 decoration: BoxDecoration(
-                                                  // color: const Color(0xFF1C2A4D),
-                                                  color: Colors.white70,
-                                                  borderRadius:
-                                                      BorderRadius.circular(20),
+                                                  color: isAppointmentExpired ? const Color(
+                                                      0xFFEFC8E6):Colors.white70,
+                                                  // color: Colors.white70,
+                                                  // borderRadius:
+                                                  //     BorderRadius.circular(20),
                                                 ),
                                                 padding:
                                                     const EdgeInsets.symmetric(
@@ -1010,7 +1057,8 @@ class _ListingPageState extends State<ListingPage> {
                                                         decoration:
                                                             BoxDecoration(
                                                           // color: const Color(0xFFE6F2FA),
-                                                          color: Colors.white,
+                                                          color: isAppointmentExpired ? Color(
+                                                              0xFFEFC8E6) : Colors.white70,
                                                           borderRadius:
                                                               BorderRadius
                                                                   .circular(4),
@@ -1051,142 +1099,235 @@ class _ListingPageState extends State<ListingPage> {
                                                     ),
                                                     const SizedBox(width: 50),
                                                     // if ((widget.headtitle != 'Appointment') && (widget.headtitle != 'Assistant'))
+                                                    // GestureDetector(
+                                                    //   onTap: () {
+                                                    //     setState(() async {
+                                                    //       selectedIndex = index;
+                                                    //       if (widget.headtitle == 'Completed Appointment' ||
+                                                    //           widget.headtitle ==
+                                                    //               'Cancelled Appointment' ||
+                                                    //           widget.headtitle ==
+                                                    //               'Scheduled Appointment' ||
+                                                    //           widget.headtitle ==
+                                                    //               'Pending Payments') {
+                                                    //         pkaID = status[
+                                                    //                     index]
+                                                    //                 ?.pkAppointmentId ??
+                                                    //             0;
+                                                    //         patientID = status[
+                                                    //                     index]
+                                                    //                 ?.fkPatientId ??
+                                                    //             0;
+                                                    //         assistantID = status[
+                                                    //                     index]
+                                                    //                 ?.pkMainMemberMasterId ??
+                                                    //             0;
+                                                    //       } else {
+                                                    //         pkaID = widget
+                                                    //                 .response
+                                                    //                 ?.result[
+                                                    //                     index]
+                                                    //                 .pkAppointmentId ??
+                                                    //             0;
+                                                    //         patientID = widget
+                                                    //                 .response
+                                                    //                 ?.result[
+                                                    //                     index]
+                                                    //                 .fkPatientId ??
+                                                    //             0;
+                                                    //         assistantID = widget
+                                                    //                 .response
+                                                    //                 ?.result[
+                                                    //                     index]
+                                                    //                 .pkMainMemberMasterId ??
+                                                    //             0;
+                                                    //       }
+                                                    //       if (widget.headtitle == 'Patients') {
+                                                    //         patientID = widget
+                                                    //                 .response
+                                                    //                 ?.result[
+                                                    //                     index]
+                                                    //                 .pkPatientId ??
+                                                    //             0;
+                                                    //         print("Patient Name :: ${widget
+                                                    //             .response
+                                                    //             ?.result[
+                                                    //         index]
+                                                    //             .patiantName ??
+                                                    //             ''}");
+                                                    //         amountPending = widget
+                                                    //                 .response
+                                                    //                 ?.result[
+                                                    //                     index]
+                                                    //                 .pendingAmount ??
+                                                    //             '';
+                                                    //
+                                                    //         patientName = widget
+                                                    //             .response
+                                                    //             ?.result[
+                                                    //         index]
+                                                    //             .patiantName ?? "";
+                                                    //         Navigator.pushNamed(
+                                                    //             context,
+                                                    //             '/patientDetail',
+                                                    //             arguments: {
+                                                    //               'patientID':
+                                                    //                   patientID,
+                                                    //               'amtPending':
+                                                    //                   amountPending,
+                                                    //               'phoneNo': widget
+                                                    //                   .response
+                                                    //                   ?.result[
+                                                    //                       index]
+                                                    //                   .patiantMobileNumber,
+                                                    //                 'isDoctorLogin' : isDoctorLogin,
+                                                    //               'patientName': patientName
+                                                    //             });
+                                                    //       } else {
+                                                    //      final result = await Navigator.pushNamed(
+                                                    //             context,
+                                                    //             '/detailScreen',
+                                                    //             arguments: {
+                                                    //               'headTitle':
+                                                    //                   widget
+                                                    //                       .headtitle,
+                                                    //               'response': widget
+                                                    //                   .response,
+                                                    //               'indexes':
+                                                    //                   index,
+                                                    //               'status':
+                                                    //                   status
+                                                    //             });
+                                                    //      if (result == true && mounted &&  widget.headtitle == "Assistant") {
+                                                    //        final dataProvider = Provider.of<DataProvider>(context, listen: false);
+                                                    //
+                                                    //        // Refresh original data depending on login type
+                                                    //        // if (isDoctorLogin) {
+                                                    //        //   await dataProvider.getPendingAppointmentListDoctor('', pkid ?? 0);
+                                                    //        //   widget.response = dataProvider.pendingAppointmentListDoctorResponse;
+                                                    //        //
+                                                    //        //
+                                                    //        //
+                                                    //        // }
+                                                    //         if (isDoctorLogin) {
+                                                    //         await dataProvider.getAssistant("", pkid ?? 0);
+                                                    //         setState(() {
+                                                    //         widget.response = dataProvider.assistantResponse;
+                                                    //         });}
+                                                    //        else {
+                                                    //          await dataProvider.getPendingAppointmentListAssistant('', pkid ?? 0);
+                                                    //          widget.response = dataProvider.pendingAppointmentListAssistantResponse;
+                                                    //        }
+                                                    //
+                                                    //        // Re-apply filter with current search text
+                                                    //        _filteredData(searchController.text);
+                                                    //
+                                                    //        setState(() {
+                                                    //          selectedIndex = null;
+                                                    //        });
+                                                    //      }
+                                                    //       }
+                                                    //     });
+                                                    //     debugPrint(
+                                                    //         'Tapped view icon at index $index');
+                                                    //   },
+                                                    //   child: const Icon(
+                                                    //       Icons
+                                                    //           .remove_red_eye_outlined,
+                                                    //       color: Colors.black),
+                                                    // ),
+
                                                     GestureDetector(
-                                                      onTap: () {
-                                                        setState(() async {
+                                                      onTap: () async { // 1. Mark onTap as async
+                                                        // 2. Update UI immediately (highlight selection)
+                                                        setState(() {
                                                           selectedIndex = index;
-                                                          if (widget.headtitle == 'Completed Appointment' ||
-                                                              widget.headtitle ==
-                                                                  'Cancelled Appointment' ||
-                                                              widget.headtitle ==
-                                                                  'Scheduled Appointment' ||
-                                                              widget.headtitle ==
-                                                                  'Pending Payments') {
-                                                            pkaID = status[
-                                                                        index]
-                                                                    ?.pkAppointmentId ??
-                                                                0;
-                                                            patientID = status[
-                                                                        index]
-                                                                    ?.fkPatientId ??
-                                                                0;
-                                                            assistantID = status[
-                                                                        index]
-                                                                    ?.pkMainMemberMasterId ??
-                                                                0;
-                                                          } else {
-                                                            pkaID = widget
-                                                                    .response
-                                                                    ?.result[
-                                                                        index]
-                                                                    .pkAppointmentId ??
-                                                                0;
-                                                            patientID = widget
-                                                                    .response
-                                                                    ?.result[
-                                                                        index]
-                                                                    .fkPatientId ??
-                                                                0;
-                                                            assistantID = widget
-                                                                    .response
-                                                                    ?.result[
-                                                                        index]
-                                                                    .pkMainMemberMasterId ??
-                                                                0;
-                                                          }
-                                                          if (widget.headtitle == 'Patients') {
-                                                            patientID = widget
-                                                                    .response
-                                                                    ?.result[
-                                                                        index]
-                                                                    .pkPatientId ??
-                                                                0;
-                                                            print("Patient Name :: ${widget
-                                                                .response
-                                                                ?.result[
-                                                            index]
-                                                                .patiantName ??
-                                                                ''}");
-                                                            amountPending = widget
-                                                                    .response
-                                                                    ?.result[
-                                                                        index]
-                                                                    .pendingAmount ??
-                                                                '';
-
-                                                            patientName = widget
-                                                                .response
-                                                                ?.result[
-                                                            index]
-                                                                .patiantName ?? "";
-                                                            Navigator.pushNamed(
-                                                                context,
-                                                                '/patientDetail',
-                                                                arguments: {
-                                                                  'patientID':
-                                                                      patientID,
-                                                                  'amtPending':
-                                                                      amountPending,
-                                                                  'phoneNo': widget
-                                                                      .response
-                                                                      ?.result[
-                                                                          index]
-                                                                      .patiantMobileNumber,
-                                                                    'isDoctorLogin' : isDoctorLogin,
-                                                                  'patientName': patientName
-                                                                });
-                                                          } else {
-                                                         final result = await Navigator.pushNamed(
-                                                                context,
-                                                                '/detailScreen',
-                                                                arguments: {
-                                                                  'headTitle':
-                                                                      widget
-                                                                          .headtitle,
-                                                                  'response': widget
-                                                                      .response,
-                                                                  'indexes':
-                                                                      index,
-                                                                  'status':
-                                                                      status
-                                                                });
-                                                         if (result == true && mounted &&  widget.headtitle == "Assistant") {
-                                                           final dataProvider = Provider.of<DataProvider>(context, listen: false);
-
-                                                           // Refresh original data depending on login type
-                                                           // if (isDoctorLogin) {
-                                                           //   await dataProvider.getPendingAppointmentListDoctor('', pkid ?? 0);
-                                                           //   widget.response = dataProvider.pendingAppointmentListDoctorResponse;
-                                                           //
-                                                           //
-                                                           //
-                                                           // }
-                                                            if (isDoctorLogin) {
-                                                            await dataProvider.getAssistant("", pkid ?? 0);
-                                                            setState(() {
-                                                            widget.response = dataProvider.assistantResponse;
-                                                            });}
-                                                           else {
-                                                             await dataProvider.getPendingAppointmentListAssistant('', pkid ?? 0);
-                                                             widget.response = dataProvider.pendingAppointmentListAssistantResponse;
-                                                           }
-
-                                                           // Re-apply filter with current search text
-                                                           _filteredData(searchController.text);
-
-                                                           setState(() {
-                                                             selectedIndex = null;
-                                                           });
-                                                         }
-                                                          }
                                                         });
-                                                        debugPrint(
-                                                            'Tapped view icon at index $index');
+
+                                                        // 3. Perform Logic (Calculation/Variable assignment doesn't need setState)
+                                                        if (widget.headtitle == 'Completed Appointment' ||
+                                                            widget.headtitle == 'Cancelled Appointment' ||
+                                                            widget.headtitle == 'Scheduled Appointment' ||
+                                                            widget.headtitle == 'Pending Payments') {
+                                                          pkaID = status[index]?.pkAppointmentId ?? 0;
+                                                          patientID = status[index]?.fkPatientId ?? 0;
+                                                          assistantID = status[index]?.pkMainMemberMasterId ?? 0;
+                                                        } else {
+                                                          pkaID = widget.response?.result[index].pkAppointmentId ?? 0;
+                                                          patientID = widget.response?.result[index].fkPatientId ?? 0;
+                                                          assistantID = widget.response?.result[index].pkMainMemberMasterId ?? 0;
+                                                        }
+
+                                                        if (widget.headtitle == 'Patients') {
+                                                          patientID = widget.response?.result[index].pkPatientId ?? 0;
+
+                                                          amountPending = widget.response?.result[index].pendingAmount ?? '';
+                                                          patientName = widget.response?.result[index].patiantName ?? "";
+
+                                                          debugPrint("Patient Name :: $patientName");
+
+                                                          // Navigate (No await needed here unless you rely on the result)
+                                                          Navigator.pushNamed(
+                                                              context,
+                                                              '/patientDetail',
+                                                              arguments: {
+                                                                'patientID': patientID,
+                                                                'amtPending': amountPending,
+                                                                'phoneNo': widget.response?.result[index].patiantMobileNumber,
+                                                                'isDoctorLogin': isDoctorLogin,
+                                                                'patientName': patientName
+                                                              }
+                                                          );
+                                                        } else {
+                                                          // 4. Perform Async Navigation
+                                                          final result = await Navigator.pushNamed(
+                                                              context,
+                                                              '/detailScreen',
+                                                              arguments: {
+                                                                'headTitle': widget.headtitle,
+                                                                'response': widget.response,
+                                                                'indexes': index,
+                                                                'status': status
+                                                              }
+                                                          );
+
+                                                          // 5. Check if widget is still on screen after await
+                                                          if (result == true && mounted && widget.headtitle == "Assistant") {
+                                                            final dataProvider = Provider.of<DataProvider>(context, listen: false);
+
+                                                            if (isDoctorLogin) {
+                                                              // Perform async data fetch
+                                                              await dataProvider.getAssistant("", pkid ?? 0);
+
+                                                              // 6. Update UI with new data
+                                                              if (mounted) {
+                                                                setState(() {
+                                                                  widget.response = dataProvider.assistantResponse;
+                                                                });
+                                                              }
+                                                            } else {
+                                                              await dataProvider.getPendingAppointmentListAssistant('', pkid ?? 0);
+                                                              // Note: If you need to update widget.response here for non-doctor, add a setState
+                                                              widget.response = dataProvider.pendingAppointmentListAssistantResponse;
+                                                            }
+
+                                                            // Re-apply filter
+                                                            _filteredData(searchController.text);
+
+                                                            // 7. Final UI update (reset selection)
+                                                            if (mounted) {
+                                                              setState(() {
+                                                                selectedIndex = null;
+                                                              });
+                                                            }
+                                                          }
+                                                        }
+                                                        debugPrint('Tapped view icon at index $index');
                                                       },
                                                       child: const Icon(
-                                                          Icons
-                                                              .remove_red_eye_outlined,
-                                                          color: Colors.black),
+                                                          Icons.remove_red_eye_outlined,
+                                                          color: Colors.black
+                                                      ),
                                                     ),
                                                     const SizedBox(width: 20),
                                                   ],
