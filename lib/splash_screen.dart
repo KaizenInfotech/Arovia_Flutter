@@ -24,8 +24,8 @@ class _SplashScreenState extends State<SplashScreen> {
 
   Future<void> _initializeApp() async {
     // All your existing initialization code moved here
-    await Firebase.initializeApp();
-    await requestNotificationPermissions();
+    // await Firebase.initializeApp();
+    // await requestNotificationPermissions();
 
     final prefs = await SharedPreferences.getInstance();
     final isFirstLaunch = prefs.getInt('isFirstLaunch') == 1;

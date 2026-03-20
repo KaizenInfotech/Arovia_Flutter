@@ -19,11 +19,11 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  // await Firebase.initializeApp();
-  // await requestNotificationPermissions();
+  await Firebase.initializeApp();
+  await requestNotificationPermissions();
   // final prefs = await SharedPreferences.getInstance();
   // final isFirstLaunch = prefs.getInt('isFirstLaunch') == 1;
-  // SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
+  SystemChrome.setPreferredOrientations([DeviceOrientation.portraitUp]);
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(create: (_) => DataProvider()),
