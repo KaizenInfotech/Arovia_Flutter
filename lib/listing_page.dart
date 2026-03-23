@@ -41,6 +41,9 @@ class _ListingPageState extends State<ListingPage> {
   String? mobforapp;
   String? patNameforapp;
 
+  int? itemCount = 0;
+  bool? isPastApointmentTapped = true;
+
   String loginUserMobileNo = "";
   List<ResultElement?> status = [];
   List<ResultElement?> filteredStatus = [];
@@ -111,10 +114,21 @@ class _ListingPageState extends State<ListingPage> {
     } else if (widget.headtitle == 'Scheduled Appointment') {
       setState(() {
         status.clear();
-        status = (widget.response?.result ?? [])
-            .where((statuses) => (statuses.status ?? '').contains('Scheduled'))
-            .toList();
-        // print('Scheduled Response:------ ${status[0]?.status}');
+        final now = DateTime.now();
+        status = (widget.response?.result ?? []).where((item) {
+          if ((item.status ?? '').contains('Scheduled') && item.appointmentDate != null) {
+            try {
+              final inputFormat = DateFormat("d/M/yyyy HH:mm");
+              final DateTime apptDate = inputFormat.parse(item.appointmentDate!);
+              return apptDate.year >= now.year &&
+                  apptDate.month >= now.month &&
+                  apptDate.day >= now.day;
+            } catch (e) {
+              return false;
+            }
+          }
+          return false;
+        }).toList();
         if (query.length > 2) {
           status = status
               .where(
@@ -376,6 +390,67 @@ class _ListingPageState extends State<ListingPage> {
                               ),
                               child: Column(
                                 children: [
+                                  if (widget.headtitle == 'Scheduled Appointment')
+                                  Padding(
+                                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 0),
+                                    child: Row(
+                                      children: [
+
+                                        _pastAppointmentButton(
+                                          isPastApointmentTapped == true ? "Past Appointment" : "Scheduled Appointment",
+                                          () {
+                                          debugPrint("Past Appointment Tapped");
+
+                                          if (!mounted) return;
+
+                                          setState(() {
+                                            isPastApointmentTapped = !isPastApointmentTapped!;
+                                            status.clear();
+                                            final now = DateTime.now();
+                                            final todayMidnight = DateTime(now.year, now.month, now.day);
+
+                                            if (isPastApointmentTapped == false) {
+                                              // Show past appointments
+                                              status = (widget.response?.result ?? []).where((item) {
+                                                if (item.status == 'Scheduled' && item.appointmentDate != null) {
+                                                  try {
+                                                    final inputFormat = DateFormat("d/M/yyyy HH:mm");
+                                                    final DateTime apptDate = inputFormat.parse(item.appointmentDate!);
+                                                    final apptDateOnly = DateTime(apptDate.year, apptDate.month, apptDate.day);
+                                                    return apptDateOnly.isBefore(todayMidnight);
+                                                  } catch (e) {
+                                                    return false;
+                                                  }
+                                                }
+                                                return false;
+                                              }).toList();
+                                            } else {
+                                              // Show scheduled (future) appointments
+                                              status = (widget.response?.result ?? []).where((item) {
+                                                if (item.status == 'Scheduled' && item.appointmentDate != null) {
+                                                  try {
+                                                    final inputFormat = DateFormat("d/M/yyyy HH:mm");
+                                                    final DateTime apptDate = inputFormat.parse(item.appointmentDate!);
+                                                    return apptDate.year >= now.year &&
+                                                        apptDate.month >= now.month &&
+                                                        apptDate.day >= now.day;
+                                                  } catch (e) {
+                                                    return false;
+                                                  }
+                                                }
+                                                return false;
+                                              }).toList();
+                                            }
+                                            itemCount = status.length;
+                                          });
+
+                                          debugPrint("Updated status length: ${itemCount}");
+                                        }),
+                                  
+                                      ],
+                                    ),
+                                  ),
+                                  
                                   // Buttons Row
                                   Padding(
                                     padding: EdgeInsets.all(((widget
@@ -806,7 +881,7 @@ class _ListingPageState extends State<ListingPage> {
                                                 widget.headtitle ==
                                                     'Pending Payments');
 
-                                        final itemCount = isStatusList
+                                         itemCount = isStatusList
                                             ? status.length
                                             : (widget.response?.result.length ??
                                                 0);
@@ -824,7 +899,7 @@ class _ListingPageState extends State<ListingPage> {
                                           );
                                         }
                                         return ListView.separated(
-                                          itemCount: itemCount,
+                                          itemCount: itemCount ?? 0,
                                           separatorBuilder: (_, __) =>
                                               const Divider(
                                                   height: 1,
@@ -1287,7 +1362,7 @@ class _ListingPageState extends State<ListingPage> {
                                                                 'headTitle': widget.headtitle,
                                                                 'response': widget.response,
                                                                 'indexes': index,
-                                                                'status': status
+                                                                'status': List<ResultElement?>.from(status)
                                                               }
                                                           );
 
@@ -1349,6 +1424,29 @@ class _ListingPageState extends State<ListingPage> {
             ],
           );
         },
+      ),
+    );
+  }
+
+  Widget _pastAppointmentButton(String label, VoidCallback onTap) {
+    return Expanded(
+      child: GestureDetector(
+        onTap: onTap,
+        child: Container(
+          height: 35,
+          decoration: BoxDecoration(
+            border: Border.all(color: Colors.black),
+            borderRadius: BorderRadius.circular(10),
+          ),
+          child: Center(
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(label, style: const TextStyle(color: Colors.black)),
+              ],
+            ),
+          ),
+        ),
       ),
     );
   }

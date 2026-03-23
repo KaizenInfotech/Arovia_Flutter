@@ -90,13 +90,14 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
     // If the app is back to foreground, re-run the check
     if (state == AppLifecycleState.resumed) {
-      // _checkForUpdates(context);kk
+
+    dynamic subscriptionCheck;
 
     if (memberType == 'Doctor') {
       await dataProvider.getSubscriptionPayment(pkID);
          final link = dataProvider.subscriptionPaymentResponse?.paymentlink ?? '';
           await dataProvider.getSubscriptionActiveDoctorAPI(pkID);
-          final subscriptionCheck = dataProvider.subscriptionActiveDoctorResponse;
+          subscriptionCheck = dataProvider.subscriptionActiveDoctorResponse;
 
           if (subscriptionCheck?.message == "Expired") {
             if (kDebugMode) {
@@ -112,7 +113,7 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
         await dataProvider.getSubscriptionPayment(pkID);
          final link = dataProvider.subscriptionPaymentResponse?.paymentlink ?? '';
           await dataProvider.getSubscriptionActiveAssistantAPI(pkID);
-          final subscriptionCheck = dataProvider.subscriptionActiveAssistantResponse;
+          subscriptionCheck = dataProvider.subscriptionActiveAssistantResponse;
 
           if (subscriptionCheck?.message == "Expired") {
             if (kDebugMode) {
@@ -123,6 +124,14 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
             });
           }
 
+    }
+
+    // If subscription is no longer expired (renewed/extended), dismiss popup and reset flag
+    if (subscriptionCheck?.message != "Expired" && _isSubscriptionPopupShown) {
+      _isSubscriptionPopupShown = false;
+      if (mounted && Navigator.of(context, rootNavigator: true).canPop()) {
+        Navigator.of(context, rootNavigator: true).pop();
+      }
     }
     }
   }
@@ -266,10 +275,9 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
     showSubscriptionExpiredPopup(
       context: context,
       link: link,
-    ).then((_) {
-      // Reset the flag when popup is dismissed (by any means)
-      _isSubscriptionPopupShown = false;
-    });
+    );
+    // Do NOT reset _isSubscriptionPopupShown here.
+    // It will be reset after re-checking subscription on app resume.
   }
 
   void _checkSessionExpired(DataProvider dataProvider) async {

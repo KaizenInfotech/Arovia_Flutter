@@ -38,11 +38,21 @@ class _OTPState extends State<OTP> with TickerProviderStateMixin {
   final TextEditingController _otp2Controller = TextEditingController();
   final TextEditingController _otp3Controller = TextEditingController();
   final TextEditingController _otp4Controller = TextEditingController();
+
+  final FocusNode _otp1Focus = FocusNode();
+  final FocusNode _otp2Focus = FocusNode();
+  final FocusNode _otp3Focus = FocusNode();
+  final FocusNode _otp4Focus = FocusNode();
+
   bool isValid = false;
 
   @override
   void dispose() {
     _controller!.dispose();
+    _otp1Focus.dispose();
+    _otp2Focus.dispose();
+    _otp3Focus.dispose();
+    _otp4Focus.dispose();
     super.dispose();
   }
 
@@ -126,14 +136,14 @@ class _OTPState extends State<OTP> with TickerProviderStateMixin {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            _buildOtpField(_otp1Controller),
+                            _buildOtpField(_otp1Controller, _otp1Focus, _otp2Focus),
                             const SizedBox(
                                 width: 10), // Add spacing between fields
-                            _buildOtpField(_otp2Controller),
+                            _buildOtpField(_otp2Controller, _otp2Focus, _otp3Focus),
                             const SizedBox(width: 10),
-                            _buildOtpField(_otp3Controller),
+                            _buildOtpField(_otp3Controller, _otp3Focus, _otp4Focus),
                             const SizedBox(width: 10),
-                            _buildOtpField(_otp4Controller),
+                            _buildOtpField(_otp4Controller, _otp4Focus, null),
                           ],
                         ),
                         const SizedBox(height: 10),
@@ -236,39 +246,40 @@ class _OTPState extends State<OTP> with TickerProviderStateMixin {
     }
   }
 
-  Widget _buildOtpField(TextEditingController controller) {
+  Widget _buildOtpField(TextEditingController controller, FocusNode focusNode, FocusNode? nextFocusNode) {
     return SizedBox(
       width: MediaQuery.of(context).size.width / 6,
       height: 90,
       child: TextFormField(
         controller: controller,
+        focusNode: focusNode,
         maxLength: 1,
         keyboardType: TextInputType.number,
         textAlign: TextAlign.center,
         style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
         decoration: InputDecoration(
           counterText: '',
-          filled: true, // Ensures background color applies
-          fillColor: Colors.white, // White background
+          filled: true,
+          fillColor: Colors.white,
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
             borderSide:
-                const BorderSide(color: Colors.grey), // Default border color
+                const BorderSide(color: Colors.grey),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
             borderSide:
-                const BorderSide(color: Colors.grey), // Border when not focused
+                const BorderSide(color: Colors.grey),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
             borderSide: const BorderSide(
-                color: Colors.blue, width: 2), // Highlighted border
+                color: Colors.blue, width: 2),
           ),
         ),
         onChanged: (value) {
-          if (value.length == 1) {
-            FocusScope.of(context).nextFocus(); // Move to the next field
+          if (value.length == 1 && nextFocusNode != null) {
+            nextFocusNode.requestFocus();
           }
         },
       ),

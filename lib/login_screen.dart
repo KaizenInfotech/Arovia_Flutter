@@ -186,7 +186,7 @@ Status           : $status
         await prefs.setString('login_user',_phoneController.text.trim());
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text("Mobile Number not exist")));
+            const SnackBar(content: Text("The mobile number entered is not registered.")));
       }
 
       final SharedPreferences prefs = await SharedPreferences.getInstance();

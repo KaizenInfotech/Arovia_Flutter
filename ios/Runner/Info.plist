@@ -26,29 +26,42 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsArbitraryLoadsInWebContent</key>
+		<true/>
+	</dict>
+	<key>NSCameraUsageDescription</key>
+	<string>Allow camera access for file upload</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Allow microphone access</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Allow photo access for file upload</string>
+	<key>UIApplicationSceneManifest</key>
+	<dict>
+		<key>UIApplicationSupportsMultipleScenes</key>
+		<false/>
+		<key>UISceneConfigurations</key>
+		<dict>
+			<key>UIWindowSceneSessionRoleApplication</key>
+			<array>
+				<dict>
+					<key>UISceneClassName</key>
+					<string>UIWindowScene</string>
+					<key>UISceneConfigurationName</key>
+					<string>flutter</string>
+					<key>UISceneDelegateClassName</key>
+					<string>FlutterSceneDelegate</string>
+					<key>UISceneStoryboardFile</key>
+					<string>Main</string>
+				</dict>
+			</array>
+		</dict>
+	</dict>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
-	<key>NSCameraUsageDescription</key>
-	<string>Allow access to the camera to take photos and videos.</string>
-	<key>NSMicrophoneUsageDescription</key>
-	<string>Allow access to the microphone to record audio.</string>
-	<key>NSCameraUsageDescription</key>
-    <string>Allow camera access for file upload</string>
-
-    <key>NSPhotoLibraryUsageDescription</key>
-    <string>Allow photo access for file upload</string>
-
-    <key>NSMicrophoneUsageDescription</key>
-    <string>Allow microphone access</string>
-
-    <key>NSAppTransportSecurity</key>
-    <dict>
-      <key>NSAllowsArbitraryLoads</key>
-      <true/>
-      <key>NSAllowsArbitraryLoadsInWebContent</key>
-      <true/>
-    </dict>
-
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>remote-notification</string>
