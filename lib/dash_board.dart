@@ -44,6 +44,8 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
 
   bool _isLoadingShown = false;
 
+  bool _isInitialLoadComplete = false;
+
   String loginUserMobileNo = "";
 
   @override
@@ -52,13 +54,15 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
     // Register the observer
     WidgetsBinding.instance.addObserver(this);
     WidgetsBinding.instance.addPostFrameCallback((_) async{
-      _getID();
+      await _getID();
+      if (!mounted) return;
       final dataProvider = Provider.of<DataProvider>(
         context,
         listen: false,
       );
       await dataProvider.getForceUpdate('Arovia');
 
+      if (!mounted) return;
       setState(() {
         apiIOS = dataProvider.loginData?.tBGroupResult?.iOS ?? '';
         apiAndroid = dataProvider.loginData?.tBGroupResult?.android ?? '';
@@ -90,6 +94,9 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
     final dataProvider = Provider.of<DataProvider>(context, listen: false);
     // If the app is back to foreground, re-run the check
     if (state == AppLifecycleState.resumed) {
+
+    // Skip subscription check until initial load is complete
+    if (!_isInitialLoadComplete) return;
 
     dynamic subscriptionCheck;
 
@@ -472,6 +479,8 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
     // 3. Only now check subscription (after confirming session is valid)
     await _checkAndShowSubscriptionIfNeeded(dataProvider);
 
+    _isInitialLoadComplete = true;
+
     // 4. Load appointment/patient data only if everything is fine
     if (memberType == 'Doctor') {
       await _fetchDoctorAppointments(dataProvider);
@@ -499,11 +508,17 @@ class _DashBoardState extends State<DashBoard> with WidgetsBindingObserver {
       subscriptionCheck = dataProvider.subscriptionActiveAssistantResponse;
     }
 
+    if (kDebugMode) {
+      print("Subscription check => message: ${subscriptionCheck?.message}, status: ${subscriptionCheck?.subsciptionStatus}");
+    }
+
     if (subscriptionCheck?.message == "Expired") {
       if (kDebugMode) {
         print("<<<<<<<<<<<<<<<<<<< Subscription Expired >>>>>>>>>>>>>>>>>>>$mobileNo");
       }
-      mobileNo != "9988776655" && mobileNo !=  "8877665544" ?  _subscriptionCheck(paymentLink) : "";
+      if (mobileNo != "9988776655" && mobileNo != "8877665544") {
+        _subscriptionCheck(paymentLink);
+      }
     }
   }
 

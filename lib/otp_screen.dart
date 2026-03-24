@@ -96,10 +96,11 @@ class _OTPState extends State<OTP> with TickerProviderStateMixin {
     return Consumer<DataProvider>(builder: (context, dataProvider, child) {
       return Scaffold(
         backgroundColor: const Color.fromRGBO(251, 246, 227, 1),
+        resizeToAvoidBottomInset: true,
         body: GestureDetector(
+          behavior: HitTestBehavior.translucent,
           onTap: () {
-            _formKey.currentState!.validate();
-            FocusScope.of(context).unfocus();
+            FocusManager.instance.primaryFocus?.unfocus();
           },
           child: SafeArea(
             child: SingleChildScrollView(
