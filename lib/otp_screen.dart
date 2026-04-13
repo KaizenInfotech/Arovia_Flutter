@@ -34,25 +34,17 @@ class _OTPState extends State<OTP> with TickerProviderStateMixin {
   bool enableResend = false;
 
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _otp1Controller = TextEditingController();
-  final TextEditingController _otp2Controller = TextEditingController();
-  final TextEditingController _otp3Controller = TextEditingController();
-  final TextEditingController _otp4Controller = TextEditingController();
-
-  final FocusNode _otp1Focus = FocusNode();
-  final FocusNode _otp2Focus = FocusNode();
-  final FocusNode _otp3Focus = FocusNode();
-  final FocusNode _otp4Focus = FocusNode();
+  final TextEditingController _otpController = TextEditingController();
+  final FocusNode _otpFocusNode = FocusNode();
+  String _otpValue = '';
 
   bool isValid = false;
 
   @override
   void dispose() {
     _controller!.dispose();
-    _otp1Focus.dispose();
-    _otp2Focus.dispose();
-    _otp3Focus.dispose();
-    _otp4Focus.dispose();
+    _otpController.dispose();
+    _otpFocusNode.dispose();
     super.dispose();
   }
 
@@ -75,10 +67,7 @@ class _OTPState extends State<OTP> with TickerProviderStateMixin {
   }
 
   void verifyOtp() {
-    String enteredOtp = _otp1Controller.text +
-        _otp2Controller.text +
-        _otp3Controller.text +
-        _otp4Controller.text;
+    String enteredOtp = _otpValue;
 
     isValid = (widget.otp == enteredOtp);
 
@@ -134,18 +123,43 @@ class _OTPState extends State<OTP> with TickerProviderStateMixin {
                               fontSize: 15, fontWeight: FontWeight.w300),
                         )),
                         const SizedBox(height: 30),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            _buildOtpField(_otp1Controller, _otp1Focus, _otp2Focus),
-                            const SizedBox(
-                                width: 10), // Add spacing between fields
-                            _buildOtpField(_otp2Controller, _otp2Focus, _otp3Focus),
-                            const SizedBox(width: 10),
-                            _buildOtpField(_otp3Controller, _otp3Focus, _otp4Focus),
-                            const SizedBox(width: 10),
-                            _buildOtpField(_otp4Controller, _otp4Focus, null),
-                          ],
+                        GestureDetector(
+                          onTap: () {
+                            _otpFocusNode.requestFocus();
+                          },
+                          child: Stack(
+                            children: [
+                              // Hidden TextField - single field, no focus switching
+                              Opacity(
+                                opacity: 0,
+                                child: SizedBox(
+                                  height: 1,
+                                  child: TextField(
+                                    controller: _otpController,
+                                    focusNode: _otpFocusNode,
+                                    keyboardType: TextInputType.number,
+                                    maxLength: 4,
+                                    autofocus: true,
+                                    onChanged: (value) {
+                                      setState(() {
+                                        _otpValue = value;
+                                      });
+                                    },
+                                  ),
+                                ),
+                              ),
+                              // Visual OTP boxes
+                              Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: List.generate(4, (index) {
+                                  return Padding(
+                                    padding: const EdgeInsets.symmetric(horizontal: 5),
+                                    child: _buildOtpBox(index),
+                                  );
+                                }),
+                              ),
+                            ],
+                          ),
                         ),
                         const SizedBox(height: 10),
                         Column(
@@ -247,42 +261,24 @@ class _OTPState extends State<OTP> with TickerProviderStateMixin {
     }
   }
 
-  Widget _buildOtpField(TextEditingController controller, FocusNode focusNode, FocusNode? nextFocusNode) {
-    return SizedBox(
+  Widget _buildOtpBox(int index) {
+    bool isFilled = index < _otpValue.length;
+    bool isActive = index == _otpValue.length && _otpFocusNode.hasFocus;
+    return Container(
       width: MediaQuery.of(context).size.width / 6,
       height: 90,
-      child: TextFormField(
-        controller: controller,
-        focusNode: focusNode,
-        maxLength: 1,
-        keyboardType: TextInputType.number,
-        textAlign: TextAlign.center,
-        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-        decoration: InputDecoration(
-          counterText: '',
-          filled: true,
-          fillColor: Colors.white,
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide:
-                const BorderSide(color: Colors.grey),
-          ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide:
-                const BorderSide(color: Colors.grey),
-          ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(
-                color: Colors.blue, width: 2),
-          ),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(8.0),
+        border: Border.all(
+          color: isActive ? Colors.blue : Colors.grey,
+          width: isActive ? 2 : 1,
         ),
-        onChanged: (value) {
-          if (value.length == 1 && nextFocusNode != null) {
-            nextFocusNode.requestFocus();
-          }
-        },
+      ),
+      alignment: Alignment.center,
+      child: Text(
+        isFilled ? _otpValue[index] : '',
+        style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
       ),
     );
   }
